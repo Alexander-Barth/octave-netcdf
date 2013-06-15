@@ -39,9 +39,9 @@ if nargin == 1
       tmp.Value = netcdf_getAtt(ncid,gid,tmp.Name);
     
       if isempty(info.Attributes)      
-        vinfo.Attributes = [tmp];
+        info.Attributes = [tmp];
       else
-        vinfo.Attributes(i+1) = tmp;
+        info.Attributes(i+1) = tmp;
       end
     end
     

@@ -25,10 +25,7 @@ varidf = netcdf.defVar(ncid,'float_var','float',[dimid]);
 varidi = netcdf.defVar(ncid,'int_var','int',[dimid]);
 
 varids = netcdf.defVar(ncid,'short_var','short',[dimid]);
-
 assert(varidd == netcdf.inqVarID(ncid,'double_var'))
-
-
 assert(netcdf.inqNVars(ncid) == 5)
 
 [varname,xtype,dimids,natts] = netcdf.inqVar(ncid,varidd);
@@ -107,6 +104,7 @@ vari2 = netcdf.getVar(ncid,varidi);
 assert(all(vari2 == vari))
 
 
+netcdf.close(ncid);
 
 test_netcdf_package_type('byte','int8');
 test_netcdf_package_type('ubyte','uint8');
@@ -121,7 +119,13 @@ test_netcdf_package_type('double','double');
 test_netcdf_package_type('float','single');
 
 test_netcdf_package_type('char','char');
-  
+
+
+fname = [tempname '-octave-netcdf.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+varidd_scalar = netcdf.defVar(ncid,'double_scalar','double',[]);
+netcdf.close(ncid);
+delete(fname);
+
 test_netcdf_hl
 
-netcdf.close(ncid);

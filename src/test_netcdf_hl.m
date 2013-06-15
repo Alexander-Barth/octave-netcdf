@@ -40,6 +40,9 @@ info = ncinfo(fname);
 assert(strcmp(info.Format,'classic'));
 
 delete(fname);
+
+% netcdf4
+
 nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','netcdf4');
 
 % error in octave:
@@ -49,7 +52,13 @@ nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','netcdf4');
 
 info = ncinfo(fname);
 assert(strcmp(info.Format,'netcdf4'));
+delete(fname)
 
+% scalar variable
+nccreate(fname,'temp','Format','netcdf4','Datatype','double');
+ncwrite(fname,'temp',123);
+assert(ncread(fname,'temp') == 123)
+delete(fname)
 
 clear s
 s.Name   = '/';
@@ -58,6 +67,7 @@ s.Dimensions(1).Name   = 'lon';
 s.Dimensions(1).Length = 20;
 s.Dimensions(2).Name   = 'lat';
 s.Dimensions(2).Length = 10;
+
 s.Attributes(1).Name = 'institution';
 s.Attributes(1).Value = 'GHER, ULg';
 
@@ -68,8 +78,12 @@ s.Variables(1).Attributes(1).Name = 'long_name';
 s.Variables(1).Attributes(1).Value = 'temperature';
 
 
-delete(fname)
+
 
 ncwriteschema(fname,s);
+
+info = ncinfo(fname);
+assert(strcmp(info.Attributes(1).Name,s.Attributes(1).Name))
+assert(strcmp(info.Attributes(1).Value,s.Attributes(1).Value))
 
 delete(fname);

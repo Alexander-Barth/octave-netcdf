@@ -331,8 +331,12 @@ DEFUN_DLD(netcdf_defVar, args,,
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value (); 
   std::string xtype = args(2).string_value ();
- 
-  Array<double> tmp = args(3).vector_value ();  
+  Array<double> tmp;
+
+  if (!args(3).is_empty()) {
+    tmp = args(3).vector_value ();  
+  } 
+
   OCTAVE_LOCAL_BUFFER (int, dimids, tmp.numel());
 
   for (int i = 0; i < tmp.numel(); i++)
