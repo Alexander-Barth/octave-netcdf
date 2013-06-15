@@ -29,7 +29,7 @@ end
 % variables
 for i = 1:length(s.Variables)  
   v = s.Variables(i);
-  v.Name
+  %v.Name
   % get dimension id
   dimids = zeros(length(v.Dimensions),1);
   for j = 1:length(v.Dimensions)

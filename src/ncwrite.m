@@ -62,14 +62,8 @@ end
 if ~isempty(factor)
   x = x / factor;
 end
-start 
-stride
-rg(x)
-filename
-varid
-ncid
+
 netcdf_putVar(ncid,varid,start-1,count,stride,x);
-%netcdf_putVar(ncid,varid,x);
 
 netcdf_close(ncid);
 

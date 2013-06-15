@@ -1,53 +1,54 @@
-delete('toto.nc');
-nccreate('toto.nc','temp','Dimensions',{'lon',10,'lat',20});
-nccreate('toto.nc','salt','Dimensions',{'lon',10,'lat',20});
-nccreate('toto.nc','u','Dimensions',{'lon','lat'});
-u = randn(10,20);
-ncwrite('toto.nc','u',u);
 
-u2 = ncread('toto.nc','u');
+fname = [tmpnam '-octave-netcdf.nc'];
+
+
+nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20});
+nccreate(fname,'salt','Dimensions',{'lon',10,'lat',20});
+nccreate(fname,'u','Dimensions',{'lon','lat'});
+u = randn(10,20);
+ncwrite(fname,'u',u);
+
+u2 = ncread(fname,'u');
 assert(isequalwithequalnans(u,u2));
 
-u2 = ncread('toto.nc','u',[10 5],[inf inf],[1 1]);
+u2 = ncread(fname,'u',[10 5],[inf inf],[1 1]);
 assert(isequalwithequalnans(u(10:end,5:end),u2));
 
-ncwriteatt('toto.nc','temp','units','degree Celsius');
-assert(strcmp(ncreadatt('toto.nc','temp','units'),'degree Celsius'));
+ncwriteatt(fname,'temp','units','degree Celsius');
+assert(strcmp(ncreadatt(fname,'temp','units'),'degree Celsius'));
 
-ncwriteatt('toto.nc','temp','range',[0 10]);
-assert(isequal(ncreadatt('toto.nc','temp','range'),[0 10]));
+ncwriteatt(fname,'temp','range',[0 10]);
+assert(isequal(ncreadatt(fname,'temp','range'),[0 10]));
 
-ncwriteatt('toto.nc','temp','float_range',single([0 10]));
-assert(isequal(ncreadatt('toto.nc','temp','float_range'),[0 10]));
+ncwriteatt(fname,'temp','float_range',single([0 10]));
+assert(isequal(ncreadatt(fname,'temp','float_range'),[0 10]));
 
-ncwriteatt('toto.nc','temp','int_range',int32([0 10]));
-assert(isequal(ncreadatt('toto.nc','temp','int_range'),[0 10]));
+ncwriteatt(fname,'temp','int_range',int32([0 10]));
+assert(isequal(ncreadatt(fname,'temp','int_range'),[0 10]));
 
-info = ncinfo('toto.nc')
+info = ncinfo(fname);
 assert(length(info.Variables) == 3)
 assert(strcmp(info.Variables(1).Name,'temp'));
+delete(fname);
 
 
+nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','64bit');
 
-delete('toto_64bitoffset.nc');
-nccreate('toto_64bitoffset.nc','temp','Dimensions',{'lon',10,'lat',20},'Format','64bit');
-
-delete('toto_classic.nc');
-nccreate('toto_classic.nc','temp','Dimensions',{'lon',10,'lat',20},'Format','classic');
-info = ncinfo('toto_classic.nc');
+delete(fname);
+nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','classic');
+info = ncinfo(fname);
 assert(strcmp(info.Format,'classic'));
 
-delete('toto_netcdf4.nc');
-nccreate('toto_netcdf4.nc','temp','Dimensions',{'lon',10,'lat',20},'Format','netcdf4');
+delete(fname);
+nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','netcdf4');
 
 % error in octave:
 % Attempting netcdf-4 operation on strict nc3 netcdf-4 file
-%ncwriteatt('toto.nc','temp','uint_range',uint32([0 10]));
-%assert(isequal(ncreadatt('toto.nc','temp','uint_range'),[0 10]));
+%ncwriteatt(fname,'temp','uint_range',uint32([0 10]));
+%assert(isequal(ncreadatt(fname,'temp','uint_range'),[0 10]));
 
-info = ncinfo('toto_netcdf4.nc');
+info = ncinfo(fname);
 assert(strcmp(info.Format,'netcdf4'));
-
 
 
 clear s
@@ -66,8 +67,9 @@ s.Variables(1).Datatype = 'double';
 s.Variables(1).Attributes(1).Name = 'long_name';
 s.Variables(1).Attributes(1).Value = 'temperature';
 
-filename = 'test_schema.nc';
-delete(filename)
 
-ncwriteschema(filename,s);
+delete(fname)
 
+ncwriteschema(fname,s);
+
+delete(fname);

@@ -1,6 +1,6 @@
 import_netcdf
 
-disp(netcdf.inqLibVers());
+libver = netcdf.inqLibVers();
 
 ncid = netcdf.create('foo.nc','NC_CLOBBER');
 assert(strcmp(netcdf.inqFormat(ncid),'FORMAT_CLASSIC'));
@@ -13,8 +13,8 @@ netcdf.getConstantNames();
 n = 10;
 m = 5;
 
-dimid_lon = netcdf.defDim(ncid,'lon',m)
-dimid = netcdf.defDim(ncid,'time',n)
+dimid_lon = netcdf.defDim(ncid,'lon',m);
+dimid = netcdf.defDim(ncid,'time',n);
 
 varidd = netcdf.defVar(ncid,'double_var','double',[dimid_lon,dimid]);
 

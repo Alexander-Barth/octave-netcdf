@@ -2,7 +2,7 @@ function test_netcdf_package_type(nctype,octtype);
 
 import_netcdf
 
-fprintf('\n%s\n',nctype)
+%fprintf('\n%s\n',nctype)
 
 m = 5;
 n = 10;
