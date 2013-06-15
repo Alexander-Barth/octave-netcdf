@@ -16,8 +16,18 @@ ncid = netcdf_create(filename,mode);
 
 % dimension
 for i = 1:length(s.Dimensions)
-  s.Dimensions(i).id = netcdf_defDim(ncid,s.Dimensions(i).Name,...
-                                          s.Dimensions(i).Length);  
+  dim = s.Dimensions(i);
+
+  if ~isfield(dim,'Unlimited')
+    dim.Unlimited = false;
+  end
+  
+  len = dim.Length;  
+  if dim.Unlimited || isinf(len)
+    len = netcdf_getConstant('NC_UNLIMITED');
+  end
+  
+  s.Dimensions(i).id = netcdf_defDim(ncid,dim.Name,len);
 end
 
 % global attributes

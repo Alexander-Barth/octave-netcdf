@@ -205,6 +205,7 @@ DEFUN_DLD(netcdf_setDefaultFormat, args,,
 }
 
 
+
 DEFUN_DLD(netcdf_create, args,, 
 "")
 {
@@ -265,6 +266,30 @@ DEFUN_DLD(netcdf_inq, args,,
   retval(2) = octave_value(ngatts);
   retval(3) = octave_value(unlimdimid);
   return retval;
+}
+
+// int nc_inq_unlimdims(int ncid, int *nunlimdimsp, int *unlimdimidsp);
+DEFUN_DLD(netcdf_inqUnlimDims, args,, 
+"")
+{
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int nunlimdims;
+
+  check_err(nc_inq_unlimdims(ncid, &nunlimdims, NULL));
+  dim_vector dv;
+  dv.resize(2);
+  dv(0) = 1;
+  dv(1) = nunlimdims;
+
+  Array<int> unlimdimids = Array<int>(dv);
+  check_err(nc_inq_unlimdims(ncid, &nunlimdims, unlimdimids.fortran_vec()));
+    
+  return octave_value(unlimdimids);
 }
 
 

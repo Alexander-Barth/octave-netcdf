@@ -7,6 +7,9 @@ fname = [tempname '-octave-netcdf.nc'];
 ncid = netcdf.create(fname,'NC_CLOBBER');
 assert(strcmp(netcdf.inqFormat(ncid),'FORMAT_CLASSIC'));
 
+unlimdimIDs = netcdf.inqUnlimDims(ncid);
+assert(isempty(unlimdimIDs));
+
 assert(netcdf.getConstant('NC_NOWRITE') == 0)
 assert(netcdf.getConstant('NC_WRITE') == 1)
 
@@ -127,5 +130,28 @@ test_netcdf_package_type('char','char');
 
 
 test_scalar_variable
+
+
+% test one unlimited dimensions
+fname = [tempname '-octave-netcdf-unlimdim.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+dimID = netcdf.defDim(ncid,'time',netcdf.getConstant('NC_UNLIMITED'));
+unlimdimIDs = netcdf.inqUnlimDims(ncid);
+assert(dimID == unlimdimIDs);
+netcdf.close(ncid);
+delete(fname)
+
+
+% test two unlimited dimensions
+fname = [tempname '-octave-netcdf-2unlimdim.nc'];
+mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
+ncid = netcdf.create(fname,mode);
+dimID = netcdf.defDim(ncid,'time',netcdf.getConstant('NC_UNLIMITED'));
+dimID2 = netcdf.defDim(ncid,'time2',netcdf.getConstant('NC_UNLIMITED'));
+unlimdimIDs = netcdf.inqUnlimDims(ncid);
+assert(isequal(sort([dimID,dimID2]),sort(unlimdimIDs)));
+netcdf.close(ncid);
+delete(fname);
+
 test_netcdf_hl
 

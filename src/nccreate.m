@@ -53,6 +53,9 @@ while i <= length(dimensions)
     i = i+1;
   else
     try
+      if isinf(dimensions{i+1})
+        dimensions{i+1} = netcdf_getConstant('NC_UNLIMITED');
+      end      
       dimids(end+1) = netcdf_defDim(ncid,dimensions{i},dimensions{i+1});
     catch
       dimids(end+1) = netcdf_inqDimID(ncid,dimensions{i});

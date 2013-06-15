@@ -13,6 +13,7 @@ function info = ncinfo(filename,varname)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
 
+
 if nargin == 1    
     info.Filename = filename;
 
@@ -21,15 +22,24 @@ if nargin == 1
     info.Format = lower(strrep(format,'FORMAT_',''));
     
     % dimensions
-    [ndims,nvars,ngatts,unlimdimid] = netcdf_inq(ncid);
+    unlimdimIDs = netcdf_inqUnlimDims(ncid);
+    [ndims,nvars,ngatts] = netcdf_inq(ncid);
+    
     % need to check if this is necessary?
-    info.Dimensions = struct('Name',{},'Length',{});
+    info.Dimensions = [];
     for i=0:ndims-1
       tmp = struct();
       [tmp.Name,tmp.Length] = netcdf_inqDim(ncid,i);
-      info.Dimensions(i+1) = tmp;
+      tmp.Unlimited = any(unlimdimIDs == i);
+      
+      if isempty(info.Dimensions) 
+        info.Dimensions = [tmp];
+      else
+        info.Dimensions(i+1) = tmp;
+      end
     end
 
+    
     % global attributes
     info.Attributes = [];
     gid = netcdf_getConstant('NC_GLOBAL');
