@@ -7,7 +7,7 @@ import_netcdf
 m = 5;
 n = 10;
 
-fname = [tmpnam '-octave-netcdf- ' nctype '.nc'];
+fname = [tempname '-octave-netcdf- ' nctype '.nc'];
 
 mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
 ncid = netcdf.create(fname,mode);

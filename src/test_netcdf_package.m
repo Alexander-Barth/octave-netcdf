@@ -2,7 +2,7 @@ import_netcdf
 
 libver = netcdf.inqLibVers();
 
-fname = [tmpnam '-octave-netcdf.nc'];
+fname = [tempname '-octave-netcdf.nc'];
 
 ncid = netcdf.create(fname,'NC_CLOBBER');
 assert(strcmp(netcdf.inqFormat(ncid),'FORMAT_CLASSIC'));

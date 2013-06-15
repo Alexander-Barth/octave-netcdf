@@ -1,5 +1,5 @@
 
-fname = [tmpnam '-octave-netcdf.nc'];
+fname = [tempname '-octave-netcdf.nc'];
 
 
 nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20});
