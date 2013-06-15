@@ -20,6 +20,7 @@ PKG_ADD: netcdf_package.cc
 
 check: PKG_ADD netcdf_package.oct
 	(mkdir tmp; cd tmp; octave --eval "pkg unload octcdf; addpath $$PWD/..; test_netcdf_package")
+#	(mkdir tmp; cd tmp; octave --eval "pkg unload octcdf; addpath $$PWD/..; test_netcdf_package")
 #	(cd ..; octave --eval "pkg unload octcdf; addpath $$PWD/netcdf; test_netcdf_package")
 
 

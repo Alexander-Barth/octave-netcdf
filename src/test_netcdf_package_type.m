@@ -7,8 +7,8 @@ import_netcdf
 m = 5;
 n = 10;
 
-fname = sprintf('foo-%s.nc',nctype);
-delete(fname);
+fname = [tmpnam '-octave-netcdf- ' nctype '.nc'];
+
 mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
 ncid = netcdf.create(fname,mode);
 
@@ -40,3 +40,4 @@ end
 
 
 netcdf.close(ncid);
+delete(fname);

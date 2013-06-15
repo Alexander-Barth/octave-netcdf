@@ -2,7 +2,9 @@ import_netcdf
 
 libver = netcdf.inqLibVers();
 
-ncid = netcdf.create('foo.nc','NC_CLOBBER');
+fname = [tmpnam '-octave-netcdf.nc'];
+
+ncid = netcdf.create(fname,'NC_CLOBBER');
 assert(strcmp(netcdf.inqFormat(ncid),'FORMAT_CLASSIC'));
 
 assert(netcdf.getConstant('NC_NOWRITE') == 0)
@@ -105,6 +107,7 @@ assert(all(vari2 == vari))
 
 
 netcdf.close(ncid);
+delete(fname);
 
 test_netcdf_package_type('byte','int8');
 test_netcdf_package_type('ubyte','uint8');
@@ -121,11 +124,6 @@ test_netcdf_package_type('float','single');
 test_netcdf_package_type('char','char');
 
 
-fname = [tempname '-octave-netcdf.nc'];
-ncid = netcdf.create(fname,'NC_CLOBBER');
-varidd_scalar = netcdf.defVar(ncid,'double_scalar','double',[]);
-netcdf.close(ncid);
-delete(fname);
-
+test_scalar_variable
 test_netcdf_hl
 
