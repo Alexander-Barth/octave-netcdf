@@ -27,7 +27,7 @@ for i = 1:2:length(varargin)
   end
 end
 
-if exist(filename,'file')
+if ~isempty(stat(filename))
   ncid = netcdf_open(filename,'NC_WRITE');
   netcdf_reDef(ncid);
 else    

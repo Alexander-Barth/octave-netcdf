@@ -122,6 +122,6 @@ test_netcdf_package_type('float','single');
 
 test_netcdf_package_type('char','char');
   
-%test_netcdf_hl
+test_netcdf_hl
 
 netcdf.close(ncid);
