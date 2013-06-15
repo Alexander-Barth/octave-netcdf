@@ -28,7 +28,9 @@ varidi = netcdf.defVar(ncid,'int_var','int',[dimid]);
 
 varids = netcdf.defVar(ncid,'short_var','short',[dimid]);
 assert(varidd == netcdf.inqVarID(ncid,'double_var'))
-assert(netcdf.inqNVars(ncid) == 5)
+
+[numdims, numvars, numglobalatts, unlimdimID] = netcdf.inq(ncid);
+assert(numvars == 5)
 
 [varname,xtype,dimids,natts] = netcdf.inqVar(ncid,varidd);
 assert(strcmp(varname,'double_var'));
