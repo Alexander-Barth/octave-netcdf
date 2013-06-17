@@ -71,6 +71,15 @@ for i = 1:length(s.Variables)
   for j = 1:length(v.Attributes)
     netcdf_putAtt(ncid,varid,v.Attributes(j).Name,v.Attributes(j).Value);
   end
+  
+  if isfield(v,'ChunkSize')
+    if ~isempty(v.ChunkSize)
+      
+    end
+  end
+  
+  %vinfo.FillValue
+  
 end
 
 netcdf_close(ncid);

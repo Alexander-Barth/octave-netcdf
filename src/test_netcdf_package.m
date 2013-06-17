@@ -153,5 +153,90 @@ assert(isequal(sort([dimID,dimID2]),sort(unlimdimIDs)));
 netcdf.close(ncid);
 delete(fname);
 
+% deflate
+fname = [tempname '-octave-netcdf-deflate.nc'];
+%mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+netcdf.defVarDeflate(ncid,varid,true,true,9);
+[shuffle,deflate,deflateLevel] = netcdf.inqVarDeflate(ncid,varid);
+assert(shuffle)
+assert(deflate)
+assert(deflateLevel == 9)
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
+
+% chunking - contiguous storage
+fname = [tempname '-octave-netcdf-chunking.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+netcdf.defVarChunking(ncid,varid,'CONTIGUOUS');
+[storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
+assert(strcmp(storage,'CONTIGUOUS'))
+assert(isempty(chunksize))
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
+% chunking - chunked storage
+fname = [tempname '-octave-netcdf-chunking.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+netcdf.defVarChunking(ncid,varid,'CHUNKED',[3 4]);
+[storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
+assert(strcmp(storage,'CHUNKED'))
+assert(isequal(chunksize,[3 4]))
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
+% variable fill
+fname = [tempname '-octave-netcdf-fill.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+netcdf.defVarFill(ncid,varid,false,-99999.);
+[nofill,fillval] = netcdf.inqVarFill(ncid,varid);
+assert(isequal(nofill,false))
+assert(fillval == -99999.)
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+% variable fill single
+fname = [tempname '-octave-netcdf-fill.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'single_var','float',dimids);
+netcdf.defVarFill(ncid,varid,false,-99999.);
+[nofill,fillval] = netcdf.inqVarFill(ncid,varid);
+assert(isequal(nofill,false))
+assert(fillval == -99999.)
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
+% variable fill char
+fname = [tempname '-octave-netcdf-fill-char.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','char',dimids);
+netcdf.defVarFill(ncid,varid,false,'X');
+[fill,fillval] = netcdf.inqVarFill(ncid,varid);
+assert(~fill)
+assert(fillval == 'X')
+netcdf.close(ncid);
+delete(fname);
+
+
 test_netcdf_hl
 

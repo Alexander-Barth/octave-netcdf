@@ -29,6 +29,7 @@ assert(isequal(ncreadatt(fname,'temp','int_range'),[0 10]));
 info = ncinfo(fname);
 assert(length(info.Variables) == 3)
 assert(strcmp(info.Variables(1).Name,'temp'));
+assert(isequal(info.Variables(1).Size,[10 20]));
 delete(fname);
 
 

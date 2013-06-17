@@ -281,12 +281,7 @@ DEFUN_DLD(netcdf_inqUnlimDims, args,,
   int nunlimdims;
 
   check_err(nc_inq_unlimdims(ncid, &nunlimdims, NULL));
-  dim_vector dv;
-  dv.resize(2);
-  dv(0) = 1;
-  dv(1) = nunlimdims;
-
-  Array<int> unlimdimids = Array<int>(dv);
+  Array<int> unlimdimids = Array<int>(dim_vector(1,nunlimdims));
   check_err(nc_inq_unlimdims(ncid, &nunlimdims, unlimdimids.fortran_vec()));
     
   return octave_value(unlimdimids);
@@ -375,6 +370,246 @@ DEFUN_DLD(netcdf_defVar, args,,
   check_err(nc_def_var (ncid, name.c_str(), _get_type(xtype), tmp.numel(), dimids, &varid));
 
   return octave_value(varid);
+}
+
+
+// int nc_def_var_fill(int ncid, int varid, int no_fill, void *fill_value);
+DEFUN_DLD(netcdf_defVarFill, args,, 
+"")
+{
+
+  if (args.length() != 4) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int no_fill = args(2).scalar_value(); // boolean
+  octave_value fill_value = args(3); 
+  nc_type xtype;
+  check_err(nc_inq_vartype (ncid, varid, &xtype));
+
+  switch (xtype)
+    {
+#define OV_NETCDF_DEF_VAR_FILL(netcdf_type,c_type,method) \
+      case netcdf_type:							\
+	{								\
+        check_err(nc_def_var_fill(ncid, varid, no_fill, fill_value.method().fortran_vec())); \
+	  break;							\
+	}                                                                       
+
+        OV_NETCDF_DEF_VAR_FILL(NC_BYTE, signed char, int8_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_UBYTE, unsigned char, uint8_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_SHORT,      short, int16_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_USHORT, unsigned short, uint16_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_INT,  int,  int32_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_UINT, unsigned int, uint32_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_INT64,  long long,  int64_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_UINT64, unsigned long long, uint64_array_value)
+
+	OV_NETCDF_DEF_VAR_FILL(NC_FLOAT, float, float_array_value)
+	OV_NETCDF_DEF_VAR_FILL(NC_DOUBLE,double,array_value)
+
+	OV_NETCDF_DEF_VAR_FILL(NC_CHAR, char, char_array_value)
+          }
+
+  return octave_value();
+}
+
+
+
+// int nc_def_var_fill(int ncid, int varid, int no_fill, void *fill_value);
+DEFUN_DLD(netcdf_inqVarFill, args,, 
+"")
+{
+
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int no_fill;
+  nc_type xtype;
+  octave_value_list retval;
+  octave_value data;
+  check_err(nc_inq_vartype (ncid, varid, &xtype));
+
+  switch (xtype)
+    {
+#define OV_NETCDF_INQ_VAR_FILL(netcdf_type,c_type)	                        \
+      case netcdf_type:							        \
+      {                                                                         \
+        Array< c_type > fill_value = Array< c_type >(dim_vector(1,1));          \
+        check_err(nc_inq_var_fill(ncid, varid, &no_fill,                        \
+                     fill_value.fortran_vec()));                                \
+        data = octave_value(fill_value);                                        \
+        break;                                                                  \
+      }                                                             
+
+      OV_NETCDF_INQ_VAR_FILL(NC_BYTE,octave_int8)
+      OV_NETCDF_INQ_VAR_FILL(NC_UBYTE,octave_uint8)
+      OV_NETCDF_INQ_VAR_FILL(NC_SHORT,octave_int16)
+      OV_NETCDF_INQ_VAR_FILL(NC_USHORT,octave_uint16)
+      OV_NETCDF_INQ_VAR_FILL(NC_INT,octave_int32)
+      OV_NETCDF_INQ_VAR_FILL(NC_UINT,octave_uint32)
+      OV_NETCDF_INQ_VAR_FILL(NC_INT64,octave_int64)
+      OV_NETCDF_INQ_VAR_FILL(NC_UINT64,octave_uint64)
+
+      OV_NETCDF_INQ_VAR_FILL(NC_FLOAT,float)
+      OV_NETCDF_INQ_VAR_FILL(NC_DOUBLE,double)
+
+      OV_NETCDF_INQ_VAR_FILL(NC_CHAR,char) 
+          }
+
+  //cout << "xtype3 " << xtype << " " << NC_DOUBLE << std::endl;
+  retval(0) = octave_value(no_fill);
+  retval(1) = data;
+  return retval;
+}
+
+
+
+
+//nc_def_var_deflate(int ncid, int varid, int shuffle, int deflate,
+//                        int deflate_level);
+DEFUN_DLD(netcdf_defVarDeflate, args,, 
+"")
+{
+
+  if (args.length() != 5) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int shuffle = args(2).scalar_value(); // boolean
+  int deflate = args(3).scalar_value(); // boolean
+  int deflate_level = args(4).scalar_value();
+
+  check_err(nc_def_var_deflate (ncid, varid, shuffle, deflate, deflate_level));
+  return octave_value();
+}
+
+
+//nc_inq_var_deflate(int ncid, int varid, int *shufflep,
+//                        int *deflatep, int *deflate_levelp);
+DEFUN_DLD(netcdf_inqVarDeflate, args,, 
+"")
+{
+
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int shuffle, deflate, deflate_level;
+  octave_value_list retval;
+
+  if (! error_state) {
+    check_err(nc_inq_var_deflate(ncid, varid, 
+                                 &shuffle,&deflate,&deflate_level));
+
+    retval(0) = octave_value(shuffle);
+    retval(1) = octave_value(deflate);
+    retval(2) = octave_value(deflate_level);
+  }
+
+  return retval;
+}
+
+//int nc_def_var_chunking(int ncid, int varid, int storage, size_t *chunksizesp);
+//chunksizes can be ommited if storage is \"CONTIGUOUS\"
+DEFUN_DLD(netcdf_defVarChunking, args,, 
+"")
+{
+
+  if (args.length() != 3 && args.length() != 4) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string storagestr = args(2).string_value();
+  int storage;
+
+  if (! error_state) {
+    if (storagestr == "CHUNKED") {
+      storage = NC_CHUNKED;
+    }
+    else if (storagestr == "CONTIGUOUS") {
+      storage = NC_CONTIGUOUS;
+    }
+    else  {
+      error("unknown storage %s",storagestr.c_str());
+      return octave_value();
+    }
+
+    if (args.length() == 4) {
+      Array<double> tmp = args(3).vector_value();
+
+      OCTAVE_LOCAL_BUFFER (size_t, chunksizes, tmp.numel());
+      for (int i = 0; i < tmp.numel(); i++)
+        {
+          chunksizes[i] = tmp(tmp.numel()-i-1);
+        }
+
+      check_err(nc_def_var_chunking(ncid, varid, storage, chunksizes));
+    }
+    else {
+      check_err(nc_def_var_chunking(ncid, varid, storage, NULL));
+    }
+  }
+
+  return octave_value();
+}
+
+//int nc_inq_var_chunking(int ncid, int varid, int *storagep, size_t *chunksizesp);
+DEFUN_DLD(netcdf_inqVarChunking, args,, 
+"")
+{
+
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int storage;
+  int ndims;
+  octave_value_list retval;
+
+  check_err(nc_inq_varndims (ncid, varid, &ndims));
+  OCTAVE_LOCAL_BUFFER (size_t, chunksizes, ndims);
+
+  if (! error_state) {
+    check_err(nc_inq_var_chunking(ncid, varid, &storage, chunksizes));
+
+    if (storage == NC_CHUNKED) {
+      retval(0) = octave_value("CHUNKED");
+      Array<int> chunkSizes = Array<int>(dim_vector(1,ndims));
+
+      for (int i = 0; i < ndims; i++)
+        {
+          chunkSizes(ndims-i-1) = chunksizes[i];
+        }
+      retval(1) = octave_value(chunkSizes);
+    }
+    else {
+      retval(0) = octave_value("CONTIGUOUS");
+      retval(1) = octave_value(Array<double>());
+    }
+
+  }
+
+  return retval;
 }
 
 

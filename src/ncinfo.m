@@ -12,32 +12,21 @@
 function info = ncinfo(filename,varname)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
-
+unlimdimIDs = netcdf_inqUnlimDims(ncid);
 
 if nargin == 1    
     info.Filename = filename;
-
+    info.Name = '/';
+    
     % format
     format = netcdf_inqFormat(ncid);
     info.Format = lower(strrep(format,'FORMAT_',''));
     
     % dimensions
-    unlimdimIDs = netcdf_inqUnlimDims(ncid);
     [ndims,nvars,ngatts] = netcdf_inq(ncid);
     
     % need to check if this is necessary?
-    info.Dimensions = [];
-    for i=0:ndims-1
-      tmp = struct();
-      [tmp.Name,tmp.Length] = netcdf_inqDim(ncid,i);
-      tmp.Unlimited = any(unlimdimIDs == i);
-      
-      if isempty(info.Dimensions) 
-        info.Dimensions = [tmp];
-      else
-        info.Dimensions(i+1) = tmp;
-      end
-    end
+    info.Dimensions = ncinfo_dim(ncid,0:ndims-1,unlimdimIDs);
 
     
     % global attributes
@@ -58,17 +47,35 @@ if nargin == 1
     nvars = netcdf_inqNVars(ncid);
     
     for i=1:nvars
-        info.Variables(i) = ncinfo_var(ncid,filename,i-1);
+        info.Variables(i) = ncinfo_var(ncid,filename,i-1,unlimdimIDs);
     end
 elseif nargin == 2
     varid = netcdf_inqVarID(ncid, varname);
-    info = ncinfo_var(ncid,filename,varid);
+    info = ncinfo_var(ncid,filename,varid,unlimdimIDs);
 end
 
 netcdf_close(ncid);
 end
 
-function vinfo = ncinfo_var(ncid,filename,varid)
+function dims = ncinfo_dim(ncid,dimids,unlimdimIDs)
+
+dims = [];
+for i=1:length(dimids)
+  tmp = struct();
+
+  [tmp.Name, tmp.Length] = netcdf_inqDim(ncid,dimids(i));
+  tmp.Unlimited = any(unlimdimIDs == dimids(i));
+    
+  if isempty(dims)
+    dims = [tmp];
+  else
+    dims(i) = tmp;
+  end
+end
+end
+
+
+function vinfo = ncinfo_var(ncid,filename,varid,unlimdimIDs)
 
 
 %varid = netcdf_inqVarID(ncid, varname)
@@ -119,21 +126,12 @@ end
 
 % Information about dimension
 
-for i=1:length(dimids)
-  tmp = struct();
-
-  [tmp.Name, tmp.Length] = netcdf_inqDim(ncid,dimids(i));
-  vinfo.Size(i) = tmp.Length;
-  
-  %tmp.Unlimited = ??
-    
-  if isempty(vinfo.Dimensions)
-    vinfo.Dimensions = [tmp];
-  else
-    vinfo.Dimensions(i) = tmp;
-  end
+vinfo.Dimensions = ncinfo_dim(ncid,dimids,unlimdimIDs);
+if isempty(vinfo.Dimensions)
+  vinfo.Size = [];
+else
+  vinfo.Size = cat(2,vinfo.Dimensions.Length);
 end
-
 % Attributes
 
 vinfo.Attributes = [];
@@ -147,16 +145,22 @@ for i = 0:natts-1
       vinfo.Attributes = [tmp];
     else
       vinfo.Attributes(i+1) = tmp;
-    end
-    
-    if strcmp(tmp.Name,'_FillValue')
-      vinfo.FillValue = tmp.Value;
-    end
+    end    
 end
 
+% chunking, fillvalue, compression
 
+[storage,vinfo.ChunkSize] = netcdf_inqVarChunking(ncid,varid);
+%[nofill,vinfo.FillValue] = netcdf_inqVarFill(ncid,varid);
+
+[vinfo.Shuffle,deflate,vinfo.DeflateLevel] = ...
+    netcdf_inqVarDeflate(ncid,varid);
+
+if ~deflate
+  vinfo.DeflateLevel = [];
 end
 
+end
 
 %% Copyright (C) 2013 Alexander Barth
 %%
