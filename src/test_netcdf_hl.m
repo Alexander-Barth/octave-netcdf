@@ -34,8 +34,8 @@ delete(fname);
 
 
 nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','64bit');
-
 delete(fname);
+
 nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','classic');
 info = ncinfo(fname);
 assert(strcmp(info.Format,'classic'));
@@ -62,8 +62,8 @@ assert(ncread(fname,'temp') == 123)
 delete(fname)
 
 test_netcdf_ncwriteschema
-%fails in matlab
-%test_netcdf_ncwriteschema_unlim
+test_netcdf_ncwriteschema_unlim
+test_netcdf_ncwriteschema_chunking
 
 % test unlimited dimension with nccreate
 fname = [tempname '-octave-netcdf.nc'];

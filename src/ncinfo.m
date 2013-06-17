@@ -133,6 +133,7 @@ end
 % chunking, fillvalue, compression
 
 [storage,vinfo.ChunkSize] = netcdf_inqVarChunking(ncid,varid);
+
 [nofill,vinfo.FillValue] = netcdf_inqVarFill(ncid,varid);
 if nofill
   vinfo.FillValue = [];

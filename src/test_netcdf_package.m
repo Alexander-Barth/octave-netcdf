@@ -195,7 +195,7 @@ fname = [tempname '-octave-netcdf-chunking.nc'];
 ncid = netcdf.create(fname,'NC_NETCDF4');
 dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
-netcdf.defVarChunking(ncid,varid,'CONTIGUOUS');
+netcdf.defVarChunking(ncid,varid,'contiguous');
 [storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
 assert(strcmp(storage,'contiguous'))
 assert(isempty(chunksize))
@@ -209,7 +209,7 @@ fname = [tempname '-octave-netcdf-chunking.nc'];
 ncid = netcdf.create(fname,'NC_NETCDF4');
 dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
-netcdf.defVarChunking(ncid,varid,'CHUNKED',[3 4]);
+netcdf.defVarChunking(ncid,varid,'chunked',[3 4]);
 [storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
 assert(strcmp(storage,'chunked'))
 assert(isequal(chunksize,[3 4]))
@@ -266,6 +266,22 @@ dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
 [nofill,fillval] = netcdf.inqVarFill(ncid,varid);
 assert(isequal(nofill,false))
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
+% create groups
+fname = [tempname '-octave-netcdf-groups.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+id1 = netcdf.defGrp(ncid,'group1');
+id2 = netcdf.defGrp(ncid,'group2');
+id3 = netcdf.defGrp(id1,'subgroup');
+ids = netcdf.inqGrps(ncid);
+assert(isequal(sort([id1,id2]),sort(ids)));
+
+id4 = netcdf.inqNcid(ncid,'group1');
+assert(id1 == id4)
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
 delete(fname);

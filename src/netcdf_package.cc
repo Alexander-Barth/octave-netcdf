@@ -561,6 +561,8 @@ DEFUN_DLD(netcdf_defVarChunking, args,,
   int storage;
 
   if (! error_state) {
+    std::transform(storagestr.begin(), storagestr.end(),storagestr.begin(), ::toupper);
+
     if (storagestr == "CHUNKED") {
       storage = NC_CHUNKED;
     }
@@ -1128,6 +1130,61 @@ DEFUN_DLD(netcdf_inqNVars, args,,
 }
 
 
+// groups
+
+//int nc_def_grp(int parent_ncid, const char *name, int *new_ncid);
+
+DEFUN_DLD(netcdf_defGrp, args,, 
+"")
+{
+
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int parent_ncid = args(0).scalar_value();
+  std::string name = args(1).string_value();
+  int new_ncid;
+
+  check_err(nc_def_grp(parent_ncid, name.c_str(), &new_ncid));
+  return octave_value(new_ncid);
+}
 
 
+// int nc_inq_grps(int ncid, int *numgrps, int *ncids);
+DEFUN_DLD(netcdf_inqGrps, args,, 
+"")
+{
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value();
+    }
 
+  int ncid = args(0).scalar_value();
+  int numgrps;
+
+  check_err(nc_inq_grps(ncid, &numgrps, NULL));
+  Array<int> ncids = Array<int>(dim_vector(1,numgrps));
+  check_err(nc_inq_grps(ncid, NULL, ncids.fortran_vec()));
+    
+  return octave_value(ncids);
+}
+
+
+// int nc_inq_ncid(int ncid, const char *name, int *grp_ncid);
+DEFUN_DLD(netcdf_inqNcid, args,, 
+"")
+{
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  std::string name = args(1).string_value();
+  int grp_ncid;
+
+  check_err(nc_inq_ncid(ncid, name.c_str(), &grp_ncid));    
+  return octave_value(grp_ncid);
+}

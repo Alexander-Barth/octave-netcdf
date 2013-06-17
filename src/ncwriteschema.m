@@ -74,7 +74,7 @@ for i = 1:length(s.Variables)
   
   if isfield(v,'ChunkSize')
     if ~isempty(v.ChunkSize)
-      
+      netcdf_defVarChunking(ncid,varid,'chunked',v.ChunkSize);
     end
   end
   

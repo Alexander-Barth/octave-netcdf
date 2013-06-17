@@ -4,7 +4,7 @@ netcdf_functions=$(awk -F'[(,]' '/DEFUN_DLD/ { print $2 } ' netcdf_package.cc)
 
 outfile=PKG_ADD
 
-rm -f $outfile
+rm -f $outfile import_netcdf.m
 
 for i in $netcdf_functions; do
     echo ${i#netcdf_}
