@@ -1211,6 +1211,41 @@ DEFUN_DLD(netcdf_inqGrpName, args,,
 }
 
 //int nc_inq_grpname_full(int ncid, size_t *lenp, char *full_name);
+DEFUN_DLD(netcdf_inqGrpNameFull, args,, 
+"")
+{
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  size_t len;
+  check_err(nc_inq_grpname_len(ncid,&len));
+  char* name = new char[len+1];
+  octave_value retval;
+
+  check_err(nc_inq_grpname_full(ncid, &len, name));
+  retval = octave_value(std::string(name));
+  delete name;
+  return retval;
+}
+
+// int nc_inq_grp_parent(int ncid, int *parent_ncid);
+DEFUN_DLD(netcdf_inqGrpParent, args,, 
+"")
+{
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int parent_ncid;
+
+  check_err(nc_inq_grp_parent(ncid, &parent_ncid));
+  return octave_value(parent_ncid);
+}
 
 
 // int nc_inq_ncid(int ncid, const char *name, int *grp_ncid);
@@ -1225,7 +1260,7 @@ DEFUN_DLD(netcdf_inqNcid, args,,
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value();
   int grp_ncid;
-
+  
   check_err(nc_inq_ncid(ncid, name.c_str(), &grp_ncid));    
   return octave_value(grp_ncid);
 }
