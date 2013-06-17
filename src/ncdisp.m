@@ -3,13 +3,12 @@ function ncdisp(filename)
 info = ncinfo(filename);
 
 fprintf('Source:\n');
-ident = repmat(' ',[1 11]);
-fprintf('%s%s\n',ident,fullfile(filename));
+indent = repmat(' ',[1 11]);
+fprintf('%s%s\n',indent,fullfile(filename));
 fprintf('Format:\n');
-fprintf('%s%s\n',ident,info.Format);
+fprintf('%s%s\n',indent,info.Format);
 
-printgroup(ident,info);
-end
+printgroup(indent,info);
 
 function s = fmtattr(val)
 if ischar(val)
@@ -17,20 +16,20 @@ if ischar(val)
 else
   s = num2str(val);
 end
-end
 
-function s = fmtsize(sz)
- 
- s = sprintf('%gx',sz);
- s = s(1:end-1);
-end
+function s = fmtsize(sz) 
+s = sprintf('%gx',sz);
+s = s(1:end-1);
 
 
-function printgroup(ident,info)
+function printgroup(indent,info)
+
+indent1 = indent(1:end-11);
+
 % attributes
 if ~isempty(info.Attributes)
-  fprintf('Global Attributes:\n');
-  printattr(ident,info.Attributes);
+  fprintf('%sGlobal Attributes:\n',indent1);
+  printattr(indent,info.Attributes);
 end
 
 % dimensions
@@ -38,51 +37,62 @@ if ~isempty(info.Dimensions)
   % length of the longest attribute name
   dim = info.Dimensions;
   maxlen = max(cellfun(@length,{dim.Name}));
-  fprintf('Dimensions:\n');
+  fprintf('%sDimensions:\n',indent1);
   for i = 1:length(dim)
     space = repmat(' ',[maxlen-length(dim(i).Name) 1]);
-    fprintf('%s%s %s= %d\n',ident,dim(i).Name,space,dim(i).Length);
+    fprintf('%s%s %s= %d\n',indent,dim(i).Name,space,dim(i).Length);
   end
 end
 
 % variables
-if ~isempty(info.Variables)
-  % length of the longest attribute name
-  vars = info.Variables;
-  fprintf('Variables:\n');
-  for i = 1:length(vars)
-    fprintf('%s%s\n',ident(1:4),vars(i).Name);
-    
-    if ~isempty(vars(i).Size)
-      sz = fmtsize(vars(i).Size);
-      dimname = sprintf('%s,',vars(i).Dimensions.Name);
-      dimname = dimname(1:end-1);
-    else
-      sz = '1x1';
-      dimname = '';
-    end
+if isfield(info,'Variables')
+  if ~isempty(info.Variables)
+    % length of the longest attribute name
+    vars = info.Variables;
+    fprintf('%sVariables:\n',indent1);
+    for i = 1:length(vars)
+      fprintf('%s%s\n',indent(1:end-7),vars(i).Name);
       
-    fprintf('%sSize:       %s\n',ident,sz);    
-    fprintf('%sDimensions: %s\n',ident,dimname);
-    fprintf('%sDatatype:   %s\n',ident,vars(i).Datatype);
-    
-    if ~isempty(vars(i).Attributes);
-      ident2 = [ident  '            '];
-      fprintf('%sAttributes:\n',ident);
-      printattr(ident2,vars(i).Attributes);
+      if ~isempty(vars(i).Size)
+        sz = fmtsize(vars(i).Size);
+        dimname = sprintf('%s,',vars(i).Dimensions.Name);
+        dimname = dimname(1:end-1);
+      else
+        sz = '1x1';
+        dimname = '';
+      end
+      
+      fprintf('%sSize:       %s\n',indent,sz);    
+      fprintf('%sDimensions: %s\n',indent,dimname);
+      fprintf('%sDatatype:   %s\n',indent,vars(i).Datatype);
+      
+      if ~isempty(vars(i).Attributes);
+        indent2 = [indent  '            '];
+        fprintf('%sAttributes:\n',indent);
+        printattr(indent2,vars(i).Attributes);
+      end
     end
-%    fprintf('\n');
   end
 end
 
-
-end
-
-function printattr(ident,attr)
+% groups
+if ~isempty(info.Groups)
   % length of the longest attribute name
-maxlen = max(cellfun(@length,{attr.Name}));
-  for i = 1:length(attr)
-    space = repmat(' ',[maxlen-length(attr(i).Name) 1]);
-    fprintf('%s%s %s= %s\n',ident,attr(i).Name,space,fmtattr(attr(i).Value));
+  grps = info.Groups;
+  fprintf('%sGroups:\n',indent1);
+  for i = 1:length(grps)
+    fprintf('%s%s\n',indent(1:end-7),grps(i).Name);
+    indent2 = [indent  '            '];
+    printgroup(indent2,grps(i));
   end
+end
+
+
+
+function printattr(indent,attr)
+% length of the longest attribute name
+maxlen = max(cellfun(@length,{attr.Name}));
+for i = 1:length(attr)
+  space = repmat(' ',[maxlen-length(attr(i).Name) 1]);
+  fprintf('%s%s %s= %s\n',indent,attr(i).Name,space,fmtattr(attr(i).Value));
 end
