@@ -8,7 +8,7 @@ fprintf('%s%s\n',indent,fullfile(filename));
 fprintf('Format:\n');
 fprintf('%s%s\n',indent,info.Format);
 
-printgroup(indent,info);
+printgroup('',info);
 
 function s = fmtattr(val)
 if ischar(val)
@@ -22,14 +22,15 @@ s = sprintf('%gx',sz);
 s = s(1:end-1);
 
 
-function printgroup(indent,info)
+function printgroup(indent1,info)
 
-indent1 = indent(1:end-11);
+indent2 = [indent1 repmat(' ',[1 11])];
+indent3 = [indent2 repmat(' ',[1 11])];
 
 % attributes
 if ~isempty(info.Attributes)
   fprintf('%sGlobal Attributes:\n',indent1);
-  printattr(indent,info.Attributes);
+  printattr(indent2,info.Attributes);
 end
 
 % dimensions
@@ -40,7 +41,7 @@ if ~isempty(info.Dimensions)
   fprintf('%sDimensions:\n',indent1);
   for i = 1:length(dim)
     space = repmat(' ',[maxlen-length(dim(i).Name) 1]);
-    fprintf('%s%s %s= %d\n',indent,dim(i).Name,space,dim(i).Length);
+    fprintf('%s%s %s= %d\n',indent2,dim(i).Name,space,dim(i).Length);
   end
 end
 
@@ -51,7 +52,8 @@ if isfield(info,'Variables')
     vars = info.Variables;
     fprintf('%sVariables:\n',indent1);
     for i = 1:length(vars)
-      fprintf('%s%s\n',indent(1:end-7),vars(i).Name);
+      fprintf('%s%s\n',indent2(1:end-7),vars(i).Name);
+      %colormsg(sprintf('%s%s\n',indent2(1:end-7),vars(i).Name),'red');
       
       if ~isempty(vars(i).Size)
         sz = fmtsize(vars(i).Size);
@@ -62,14 +64,13 @@ if isfield(info,'Variables')
         dimname = '';
       end
       
-      fprintf('%sSize:       %s\n',indent,sz);    
-      fprintf('%sDimensions: %s\n',indent,dimname);
-      fprintf('%sDatatype:   %s\n',indent,vars(i).Datatype);
+      fprintf('%sSize:       %s\n',indent2,sz);    
+      fprintf('%sDimensions: %s\n',indent2,dimname);
+      fprintf('%sDatatype:   %s\n',indent2,vars(i).Datatype);
       
       if ~isempty(vars(i).Attributes);
-        indent2 = [indent  '            '];
-        fprintf('%sAttributes:\n',indent);
-        printattr(indent2,vars(i).Attributes);
+        fprintf('%sAttributes:\n',indent2);
+        printattr(indent3,vars(i).Attributes);
       end
     end
   end
@@ -81,8 +82,7 @@ if ~isempty(info.Groups)
   grps = info.Groups;
   fprintf('%sGroups:\n',indent1);
   for i = 1:length(grps)
-    fprintf('%s%s\n',indent(1:end-7),grps(i).Name);
-    indent2 = [indent  '            '];
+    fprintf('%s%s\n',indent2(1:end-7),grps(i).Name);
     printgroup(indent2,grps(i));
   end
 end
@@ -96,3 +96,55 @@ for i = 1:length(attr)
   space = repmat(' ',[maxlen-length(attr(i).Name) 1]);
   fprintf('%s%s %s= %s\n',indent,attr(i).Name,space,fmtattr(attr(i).Value));
 end
+
+
+
+function colormsg (msg,color)
+
+%getenv('TERM')
+%if strcmp(getenv('TERM'),'xterm') % && exist('puts') > 1
+% only in octave
+if exist('puts') > 1
+  esc = char(27);          
+
+  % ANSI escape codes
+  colors.black   = [esc, '[40m'];
+  colors.red     = [esc, '[41m'];
+  colors.green   = [esc, '[42m'];
+  colors.yellow  = [esc, '[43m'];
+  colors.blue    = [esc, '[44m'];
+  colors.magenta = [esc, '[45m'];
+  colors.cyan    = [esc, '[46m'];
+  colors.white   = [esc, '[47m'];
+
+  reset = [esc, '[0m'];
+  
+  c = getfield(colors,color);
+           
+  %oldpso = page_screen_output (0);
+
+  try
+    fprintf([c, msg, reset]);
+    %puts (reset); % reset terminal
+  catch
+    %page_screen_output (oldpso);
+  end
+else
+  fprintf(msg);
+end
+
+
+%% Copyright (C) 2013 Alexander Barth
+%%
+%% This program is free software; you can redistribute it and/or modify
+%% it under the terms of the GNU General Public License as published by
+%% the Free Software Foundation; either version 2 of the License, or
+%% (at your option) any later version.
+%%
+%% This program is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%% GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with this program; If not, see <http://www.gnu.org/licenses/>.
