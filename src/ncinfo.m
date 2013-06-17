@@ -8,47 +8,27 @@
 % vinfo.Size: the size of the netcdf variable. For vectors the Size field
 %   has only one element.
 %
+% Note: If there are no attributes (or variable or groups), the corresponding 
+% field is an empty matrix and not an empty struct array for compability
+% with matlab.
+% 
+%
 %
 function info = ncinfo(filename,varname)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
-unlimdimIDs = netcdf_inqUnlimDims(ncid);
 
 if nargin == 1    
-    info.Filename = filename;
-    info.Name = '/';
-    
-    [ndims,nvars,ngatts] = netcdf_inq(ncid);
-    
-    % dimensions
-    info.Dimensions = ncinfo_dim(ncid,0:ndims-1,unlimdimIDs);
-
-    % variables
-    for i=1:nvars
-        info.Variables(i) = ncinfo_var(ncid,filename,i-1,unlimdimIDs);
-    end
-
-    % global attributes
-    info.Attributes = [];
-    gid = netcdf_getConstant('NC_GLOBAL');
-    for i = 0:ngatts-1  
-      tmp = struct();
-      tmp.Name = netcdf_inqAttName(ncid,gid,i);
-      tmp.Value = netcdf_getAtt(ncid,gid,tmp.Name);
-    
-      if isempty(info.Attributes)      
-        info.Attributes = [tmp];
-      else
-        info.Attributes(i+1) = tmp;
-      end
-    end
+    info.Filename = filename;    
+    info = ncinfo_group(ncid,info);
     
     % format
     format = netcdf_inqFormat(ncid);
     info.Format = lower(strrep(format,'FORMAT_',''));    
 elseif nargin == 2
+    unlimdimIDs = netcdf_inqUnlimDims(ncid);
     varid = netcdf_inqVarID(ncid, varname);
-    info = ncinfo_var(ncid,filename,varid,unlimdimIDs);
+    info = ncinfo_var(ncid,varid,unlimdimIDs);
 end
 
 netcdf_close(ncid);
@@ -72,7 +52,7 @@ end
 end
 
 
-function vinfo = ncinfo_var(ncid,filename,varid,unlimdimIDs)
+function vinfo = ncinfo_var(ncid,varid,unlimdimIDs)
 
 [vinfo.Name,xtype,dimids,natts] = netcdf_inqVar(ncid,varid);
 
@@ -148,6 +128,57 @@ end
 vinfo.Shuffle = shuffle;
 
 end
+
+
+function info = ncinfo_group(ncid,info)
+if nargin == 1
+  info = struct();
+end
+
+info.Name = netcdf_inqGrpName(ncid);
+unlimdimIDs = netcdf_inqUnlimDims(ncid);
+
+[ndims,nvars,ngatts] = netcdf_inq(ncid);
+
+% dimensions
+
+dimids = netcdf_inqDimIDs(ncid);
+info.Dimensions = ncinfo_dim(ncid,dimids,unlimdimIDs);
+
+% variables
+for i=1:nvars
+  info.Variables(i) = ncinfo_var(ncid,i-1,unlimdimIDs);
+end
+
+% global attributes
+info.Attributes = [];
+gid = netcdf_getConstant('NC_GLOBAL');
+for i = 0:ngatts-1  
+  tmp = struct();
+  tmp.Name = netcdf_inqAttName(ncid,gid,i);
+  tmp.Value = netcdf_getAtt(ncid,gid,tmp.Name);
+  
+  if isempty(info.Attributes)      
+    info.Attributes = [tmp];
+  else
+    info.Attributes(i+1) = tmp;
+  end
+end
+
+info.Groups = [];
+gids = netcdf_inqGrps(ncid);
+for i = 1:length(gids)
+  tmp = ncinfo_group(gids(i));
+  
+  if isempty(info.Groups)      
+    info.Groups = [tmp];
+  else
+    info.Groups(i) = tmp;
+  end
+end
+
+end
+
 
 %% Copyright (C) 2013 Alexander Barth
 %%

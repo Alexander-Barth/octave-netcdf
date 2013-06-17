@@ -45,11 +45,8 @@ delete(fname);
 % netcdf4
 
 nccreate(fname,'temp','Dimensions',{'lon',10,'lat',20},'Format','netcdf4');
-
-% error in octave:
-% Attempting netcdf-4 operation on strict nc3 netcdf-4 file
-%ncwriteatt(fname,'temp','uint_range',uint32([0 10]));
-%assert(isequal(ncreadatt(fname,'temp','uint_range'),[0 10]));
+ncwriteatt(fname,'temp','uint_range',uint32([0 10]));
+assert(isequal(ncreadatt(fname,'temp','uint_range'),[0 10]));
 
 info = ncinfo(fname);
 assert(strcmp(info.Format,'netcdf4'));

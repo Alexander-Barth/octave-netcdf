@@ -1104,6 +1104,29 @@ DEFUN_DLD(netcdf_inqDimID, args,,
   return retval;
 }
 
+// int nc_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents);
+DEFUN_DLD(netcdf_inqDimIDs, args,, 
+"")
+{
+  if (args.length() != 1 && args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int include_parents = 0;
+  if (args.length() == 2) {
+    include_parents = args(0).scalar_value();  
+  }
+
+  int ndims;
+  check_err(nc_inq_ndims(ncid, &ndims));
+  Array<int> dimids = Array<int>(dim_vector(1,ndims));
+  check_err(nc_inq_dimids(ncid, &ndims, dimids.fortran_vec(),include_parents));
+    
+  return octave_value(dimids);
+}
+
 
 DEFUN_DLD(netcdf_inqNVars, args,, 
 "")
@@ -1170,6 +1193,24 @@ DEFUN_DLD(netcdf_inqGrps, args,,
     
   return octave_value(ncids);
 }
+
+//int nc_inq_grpname(int ncid, char *name);
+DEFUN_DLD(netcdf_inqGrpName, args,, 
+"")
+{
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  char name[NC_MAX_NAME+1];
+
+  check_err(nc_inq_grpname(ncid, name));    
+  return octave_value(std::string(name));
+}
+
+//int nc_inq_grpname_full(int ncid, size_t *lenp, char *full_name);
 
 
 // int nc_inq_ncid(int ncid, const char *name, int *grp_ncid);

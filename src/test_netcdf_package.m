@@ -282,6 +282,10 @@ assert(isequal(sort([id1,id2]),sort(ids)));
 
 id4 = netcdf.inqNcid(ncid,'group1');
 assert(id1 == id4)
+
+name = netcdf.inqGrpName(id3);
+assert(strcmp(name,'subgroup'))
+
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
 delete(fname);
