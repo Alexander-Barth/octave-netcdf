@@ -10,15 +10,15 @@
 function x = ncread(filename,varname,start,count,stride)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
-varid = netcdf_inqVarID(ncid, varname);
-[varname_,xtype,dimids,natts] = netcdf_inqVar(ncid,varid);
+[gid,varid] = ncvarid(ncid,varname);
+[varname_,xtype,dimids,natts] = netcdf_inqVar(gid,varid);
 
 % number of dimenions
 nd = length(dimids);
 
 sz = zeros(1,nd);
 for i=1:length(dimids)
-  [dimname, sz(i)] = netcdf_inqDim(ncid,dimids(i));
+  [dimname, sz(i)] = netcdf_inqDim(gid,dimids(i));
 end
 
 if nargin < 3
@@ -37,7 +37,7 @@ end
 i = count == inf;
 count(i) = (sz(i)-start(i))./stride(i) + 1;
 
-x = netcdf_getVar(ncid,varid,start-1,count,stride);
+x = netcdf_getVar(gid,varid,start-1,count,stride);
 
 % apply attributes
 
@@ -46,14 +46,14 @@ offset = [];
 fv = [];
 
 for i = 0:natts-1
-  attname = netcdf_inqAttName(ncid,varid,i);
+  attname = netcdf_inqAttName(gid,varid,i);
 %  attname
   if strcmp(attname,'scale_factor')
-    factor = netcdf_getAtt(ncid,varid,'scale_factor');
+    factor = netcdf_getAtt(gid,varid,'scale_factor');
   elseif strcmp(attname,'add_offset')
-    offset = netcdf_getAtt(ncid,varid,'add_offset');
+    offset = netcdf_getAtt(gid,varid,'add_offset');
   elseif strcmp(attname,'_FillValue')
-    fv = netcdf_getAtt(ncid,varid,'_FillValue');
+    fv = netcdf_getAtt(gid,varid,'_FillValue');
   end    
 end
 

@@ -1247,6 +1247,24 @@ DEFUN_DLD(netcdf_inqGrpParent, args,,
   return octave_value(parent_ncid);
 }
 
+// int nc_inq_grp_full_ncid(int ncid, char *full_name, int *grp_ncid);
+DEFUN_DLD(netcdf_inqGrpFullNcid, args,, 
+"")
+{
+  if (args.length() != 2) {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  std::string name = args(1).string_value();
+  int grp_ncid;
+
+  check_err(nc_inq_grp_full_ncid(ncid, name.c_str(),&grp_ncid));
+  return octave_value(grp_ncid);
+}
+
+
 
 // int nc_inq_ncid(int ncid, const char *name, int *grp_ncid);
 DEFUN_DLD(netcdf_inqNcid, args,, 

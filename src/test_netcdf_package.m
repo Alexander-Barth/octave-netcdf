@@ -292,6 +292,11 @@ assert(strcmp(name,'/group1/subgroup'))
 parentid = netcdf.inqGrpParent(id3);
 assert(id1 == parentid);
 
+if 0
+  id3bis = netcdf.inqGrpFullNcid(ncid,'/group1/subgroup');
+  assert(id3 == id3bis);
+end
+
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
 delete(fname);

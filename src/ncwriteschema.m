@@ -1,6 +1,24 @@
 function ncwriteschema(filename,s)
 
+
+
+mode = format2mode(s.Format);
+ncid = netcdf_create(filename,mode);
+write_group(ncid,s)
+
+netcdf_close(ncid);
+
+end
+
+function write_group(ncid,s)
 % normalize schema
+
+if ~isfield(s,'Dimensions')
+  s.Dimensions = [];
+end
+if isempty(s.Dimensions)
+  s.Dimensions = struct('Name',{},'Length',{},'Unlimited',{});
+end
 
 if ~isfield(s,'Attributes')
   s.Attributes = struct('Name',{},'Value',{});
@@ -9,10 +27,6 @@ end
 if ~isfield(s,'Variables')
   s.Variables = struct('Name',{},'Dimensions',{},'Datatype',{});;
 end
-
-
-mode = format2mode(s.Format);
-ncid = netcdf_create(filename,mode);
 
 % dimension
 for i = 1:length(s.Dimensions)
@@ -43,14 +57,9 @@ for i = 1:length(s.Variables)
   % get dimension id
   dimids = zeros(length(v.Dimensions),1);
   for j = 1:length(v.Dimensions)
-    ind = find(strcmp({s.Dimensions.Name},v.Dimensions(j).Name));    
-    if isempty(ind)
-      error('netcdf:unknownDim','Unkown dimension %s',Dimensions(j).Name);
-    end
-    
-    dimids(j) = s.Dimensions(ind).id;
+    dimids(j) = netcdf_inqDimID(ncid,v.Dimensions(j).Name);
   end
-  
+
   % define variable
   switch lower(v.Datatype)
    case 'int32'
@@ -77,9 +86,20 @@ for i = 1:length(s.Variables)
       netcdf_defVarChunking(ncid,varid,'chunked',v.ChunkSize);
     end
   end
-  
-  %vinfo.FillValue
-  
 end
 
-netcdf_close(ncid);
+%vinfo.FillValue
+
+% groups
+if isfield(s,'Groups')
+  if ~isempty(s.Groups)
+    for i=1:length(s.Groups)
+      g = s.Groups(i);
+      gid = netcdf_defGrp(ncid,g.Name);
+      write_group(gid,g);
+    end
+  end
+end   
+end
+
+

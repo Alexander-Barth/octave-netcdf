@@ -61,6 +61,7 @@ delete(fname)
 test_netcdf_ncwriteschema
 test_netcdf_ncwriteschema_unlim
 test_netcdf_ncwriteschema_chunking
+test_netcdf_ncwriteschema_group
 
 % test unlimited dimension with nccreate
 fname = [tempname '-octave-netcdf.nc'];
