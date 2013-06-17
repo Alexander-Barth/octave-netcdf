@@ -54,7 +54,17 @@ int netcdf_constants(octave_value ov)
     }
   else
     {
-      return _get_constant(ov.string_value());
+      std::string name = ov.string_value();
+      std::string prefix = "NC_";
+      
+      // add prefix if it is missing
+      if (name.substr(0, prefix.size()) != prefix) {
+        name = prefix + name;
+      }
+      // to upper case
+      std::transform(name.begin(), name.end(),name.begin(), ::toupper);
+
+      return _get_constant(name);
     }
 }
 
@@ -512,8 +522,19 @@ DEFUN_DLD(netcdf_inqVarDeflate, args,,
   octave_value_list retval;
 
   if (! error_state) {
-    check_err(nc_inq_var_deflate(ncid, varid, 
-                                 &shuffle,&deflate,&deflate_level));
+    int format;
+    check_err(nc_inq_format(ncid, &format));
+
+    // nc_inq_var_deflate returns garbage for classic or 64bit files
+    if (format == NC_FORMAT_CLASSIC || format == NC_FORMAT_64BIT) {
+      shuffle = 0;
+      deflate = 0; 
+      deflate_level = 0;
+    }
+    else {
+      check_err(nc_inq_var_deflate(ncid, varid, 
+                                   &shuffle,&deflate,&deflate_level));
+    }
 
     retval(0) = octave_value(shuffle);
     retval(1) = octave_value(deflate);
@@ -593,7 +614,7 @@ DEFUN_DLD(netcdf_inqVarChunking, args,,
     check_err(nc_inq_var_chunking(ncid, varid, &storage, chunksizes));
 
     if (storage == NC_CHUNKED) {
-      retval(0) = octave_value("CHUNKED");
+      retval(0) = octave_value("chunked");
       Array<int> chunkSizes = Array<int>(dim_vector(1,ndims));
 
       for (int i = 0; i < ndims; i++)
@@ -603,7 +624,7 @@ DEFUN_DLD(netcdf_inqVarChunking, args,,
       retval(1) = octave_value(chunkSizes);
     }
     else {
-      retval(0) = octave_value("CONTIGUOUS");
+      retval(0) = octave_value("contiguous");
       retval(1) = octave_value(Array<double>());
     }
 

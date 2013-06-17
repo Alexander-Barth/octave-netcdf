@@ -13,6 +13,12 @@ assert(isempty(unlimdimIDs));
 assert(netcdf.getConstant('NC_NOWRITE') == 0)
 assert(netcdf.getConstant('NC_WRITE') == 1)
 
+assert(netcdf.getConstant('NC_64BIT_OFFSET') == ...
+       netcdf.getConstant('64BIT_OFFSET'))
+
+assert(netcdf.getConstant('NC_64BIT_OFFSET') == ...
+       netcdf.getConstant('64bit_offset'))
+
 netcdf.getConstantNames();
 
 n = 10;
@@ -153,9 +159,23 @@ assert(isequal(sort([dimID,dimID2]),sort(unlimdimIDs)));
 netcdf.close(ncid);
 delete(fname);
 
+
+% deflate for 64bit_offset files
+fname = [tempname '-octave-netcdf-deflate.nc'];
+ncid = netcdf.create(fname,'64BIT_OFFSET');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+[shuffle,deflate,deflateLevel] = netcdf.inqVarDeflate(ncid,varid);
+assert(shuffle == 0)
+assert(deflate == 0)
+assert(deflateLevel == 0)
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
 % deflate
 fname = [tempname '-octave-netcdf-deflate.nc'];
-%mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
 ncid = netcdf.create(fname,'NC_NETCDF4');
 dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
@@ -177,7 +197,7 @@ dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
 netcdf.defVarChunking(ncid,varid,'CONTIGUOUS');
 [storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
-assert(strcmp(storage,'CONTIGUOUS'))
+assert(strcmp(storage,'contiguous'))
 assert(isempty(chunksize))
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
@@ -191,7 +211,7 @@ dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
 netcdf.defVarChunking(ncid,varid,'CHUNKED',[3 4]);
 [storage,chunksize] = netcdf.inqVarChunking(ncid,varid);
-assert(strcmp(storage,'CHUNKED'))
+assert(strcmp(storage,'chunked'))
 assert(isequal(chunksize,[3 4]))
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
@@ -216,7 +236,7 @@ fname = [tempname '-octave-netcdf-fill.nc'];
 ncid = netcdf.create(fname,'NC_NETCDF4');
 dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'single_var','float',dimids);
-netcdf.defVarFill(ncid,varid,false,-99999.);
+netcdf.defVarFill(ncid,varid,false,single(-99999.));
 [nofill,fillval] = netcdf.inqVarFill(ncid,varid);
 assert(isequal(nofill,false))
 assert(fillval == -99999.)
@@ -235,6 +255,19 @@ netcdf.defVarFill(ncid,varid,false,'X');
 assert(~fill)
 assert(fillval == 'X')
 netcdf.close(ncid);
+delete(fname);
+
+
+
+% check default state of fill
+fname = [tempname '-octave-netcdf-fill.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+[nofill,fillval] = netcdf.inqVarFill(ncid,varid);
+assert(isequal(nofill,false))
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
 delete(fname);
 
 
