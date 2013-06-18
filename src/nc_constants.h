@@ -16,17 +16,6 @@
   constants["NC_OPAQUE"] = NC_OPAQUE;
   constants["NC_ENUM"] = NC_ENUM;
   constants["NC_COMPOUND"] = NC_COMPOUND;
-  constants["NC_FILL_BYTE"] = NC_FILL_BYTE;
-  constants["NC_FILL_CHAR"] = NC_FILL_CHAR;
-  constants["NC_FILL_SHORT"] = NC_FILL_SHORT;
-  constants["NC_FILL_INT"] = NC_FILL_INT;
-  constants["NC_FILL_FLOAT"] = NC_FILL_FLOAT;
-  constants["NC_FILL_DOUBLE"] = NC_FILL_DOUBLE;
-  constants["NC_FILL_UBYTE"] = NC_FILL_UBYTE;
-  constants["NC_FILL_USHORT"] = NC_FILL_USHORT;
-  constants["NC_FILL_UINT"] = NC_FILL_UINT;
-  constants["NC_FILL_INT64"] = NC_FILL_INT64;
-  constants["NC_FILL_UINT64"] = NC_FILL_UINT64;
   constants["NC_MAX_BYTE"] = NC_MAX_BYTE;
   constants["NC_MIN_BYTE"] = NC_MIN_BYTE;
   constants["NC_MAX_CHAR"] = NC_MAX_CHAR;

@@ -39,14 +39,26 @@ int _get_constant(std::string name)
     error("unknown netcdf constant: %s",name.c_str());
 }
 
-int _get_type(std::string name) 
-{
-  std::transform(name.begin(), name.end(),name.begin(), ::toupper);
-  return _get_constant("NC_" + name);
+// convert name to upper-case and add "NC_" prefix if it is missing
+std::string normalize_ncname(std::string name) {
+  std::string prefix = "NC_";
+  std::string ncname = name;
+  // to upper case
+  std::transform(ncname.begin(), ncname.end(),ncname.begin(), ::toupper);
+      
+  // add prefix if it is missing
+  if (ncname.substr(0, prefix.size()) != prefix) {
+    ncname = prefix + ncname;
+  }  
+  return ncname;
 }
 
+int _get_type(std::string name) 
+{
+  return _get_constant(normalize_ncname(name));
+}
 
-int netcdf_constants(octave_value ov) 
+int netcdf_constants_int(octave_value ov) 
 {
   if (ov.is_scalar_type())
     {
@@ -54,16 +66,7 @@ int netcdf_constants(octave_value ov)
     }
   else
     {
-      std::string name = ov.string_value();
-      std::string prefix = "NC_";
-      
-      // add prefix if it is missing
-      if (name.substr(0, prefix.size()) != prefix) {
-        name = prefix + name;
-      }
-      // to upper case
-      std::transform(name.begin(), name.end(),name.begin(), ::toupper);
-
+      std::string name = normalize_ncname(ov.string_value());
       return _get_constant(name);
     }
 }
@@ -159,7 +162,35 @@ DEFUN_DLD(netcdf_getConstant, args,,
       return octave_value();
     }
 
-  return octave_value(netcdf_constants(args(0)));
+  octave_value ov = args(0);
+  if (ov.is_scalar_type())
+    {
+      return ov;
+    }
+
+  std::string name = ov.string_value();
+
+  name = normalize_ncname(name);
+
+#define OV_NETCDF_CONST(nctype,octtype)                 \
+  if (name == std::string("NC_FILL_") + #nctype) \ 
+  return octave_value(octave_ ## octtype(NC_FILL_ ## nctype));
+
+  OV_NETCDF_CONST(BYTE,   int8)
+  OV_NETCDF_CONST(UBYTE,  uint8)
+  OV_NETCDF_CONST(SHORT,  int16)
+  OV_NETCDF_CONST(USHORT, uint16)
+  OV_NETCDF_CONST(INT,    int32)
+  OV_NETCDF_CONST(UINT,   uint32)
+  OV_NETCDF_CONST(INT64,  int64)
+  OV_NETCDF_CONST(UINT64, uint64)
+
+  if (name == "NC_FILL_FLOAT") return octave_value((float)(NC_FILL_FLOAT));
+  if (name == "NC_FILL_DOUBLE") return octave_value((double)(NC_FILL_DOUBLE));
+  if (name == "NC_FILL_STRING") return octave_value(std::string(NC_FILL_STRING));
+  if (name == "NC_FILL_CHAR") return octave_value(std::string(NC_FILL_CHAR));
+
+  return octave_value(_get_constant(name));
 }
 
 
@@ -206,7 +237,7 @@ DEFUN_DLD(netcdf_setDefaultFormat, args,,
       print_usage ();
       return octave_value();
     }
-  int format = netcdf_constants(args(0));
+  int format = netcdf_constants_int(args(0));
   int old_format;
 
   check_err(nc_set_default_format(format, &old_format));
@@ -226,7 +257,7 @@ DEFUN_DLD(netcdf_create, args,,
     }
 
   std::string filename = args(0).string_value();
-  int mode = netcdf_constants(args(1));
+  int mode = netcdf_constants_int(args(1));
   int ncid;
 
   check_err(nc_create(filename.c_str(), mode, &ncid));
@@ -244,7 +275,7 @@ DEFUN_DLD(netcdf_open, args,,
     }
 
   std::string filename = args(0).string_value();
-  int mode = netcdf_constants(args(1));
+  int mode = netcdf_constants_int(args(1));
   int ncid;
 
   check_err(nc_open(filename.c_str(), mode, &ncid));

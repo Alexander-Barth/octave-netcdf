@@ -19,6 +19,11 @@ assert(netcdf.getConstant('NC_64BIT_OFFSET') == ...
 assert(netcdf.getConstant('NC_64BIT_OFFSET') == ...
        netcdf.getConstant('64bit_offset'))
 
+assert(isa(netcdf.getConstant('fill_byte'),'int8'))
+assert(isa(netcdf.getConstant('fill_ubyte'),'uint8'))
+assert(isa(netcdf.getConstant('fill_float'),'single'))
+
+
 netcdf.getConstantNames();
 
 n = 10;

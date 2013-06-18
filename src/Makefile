@@ -7,7 +7,7 @@ NCHEADER=/usr/include/netcdf.h
 all: netcdf_package.oct
 
 constants:
-	awk '/\#define[ \t]+NC_[0-9a-zA-Z_]*[ \t]+/ { printf "  constants[\"%s\"] = %s;\n",$$2,$$2 }' $(NCHEADER) | grep -v NC_TURN_OFF_LOGGING | fgrep -v NC_FILL_STRING > nc_constants.h
+	awk '/\#define[ \t]+NC_[0-9a-zA-Z_]*[ \t]+/ { printf "  constants[\"%s\"] = %s;\n",$$2,$$2 }' $(NCHEADER) | grep -v NC_TURN_OFF_LOGGING | fgrep -v NC_FILL_ > nc_constants.h
 
 clean:
 	rm netcdf_package.oct
