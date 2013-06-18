@@ -874,6 +874,39 @@ DEFUN_DLD(netcdf_inqAttName, args,,
   return octave_value(std::string(name));  
 }
 
+//int nc_inq_att    (int ncid, int varid, const char *name,
+//                        nc_type *xtypep, size_t *lenp);
+
+DEFUN_DLD(netcdf_inqAtt, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} {[@var{xtype},@var{len}] = } netcdf_inqAtt(@var{ncid},@var{varid},@var{name}) \n\
+Get attribute type and length.\n\
+@end deftypefn\n\
+@seealso{netcdf_inqAttName}\n")
+{
+  if (args.length() != 3) {
+    print_usage ();
+    return octave_value();
+  }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string name = args(2).string_value();
+  int xtype;
+  size_t len;
+  octave_value_list retval;
+  
+  if (error_state) {
+    return octave_value();    
+  }
+
+  check_err(nc_inq_att(ncid, varid, name.c_str(), &xtype, &len));
+  
+  retval(0) = octave_value(xtype);
+  retval(1) = octave_value(len);
+  return retval;
+}
+
 
 DEFUN_DLD(netcdf_getAtt, args,, 
 "")

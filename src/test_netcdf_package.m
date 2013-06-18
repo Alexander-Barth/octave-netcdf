@@ -63,6 +63,10 @@ netcdf.putAtt(ncid,varidd,'add_offset',single(123123.123));
 netcdf.putAtt(ncid,varidd,'_FillValue',double(123123.123));
 netcdf.putAtt(ncid,varidd,'name','this is a name');
 
+[xtype,len] = netcdf.inqAtt(ncid,varidd,'name');
+assert(xtype == netcdf.getConstant('NC_CHAR'))
+assert(len == length('this is a name'))
+
 assert(isequal(netcdf.getAtt(ncid,varidd,'add_offset'),single(123123.123)));
 
 netcdf.endDef(ncid)
