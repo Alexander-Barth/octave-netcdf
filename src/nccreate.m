@@ -9,6 +9,8 @@ DeflateLevel = 'disable';
 Shuffle = false;
 
 
+
+
 for i = 1:2:length(varargin)
   if strcmp(varargin{i},'Dimensions')
     dimensions = varargin{i+1};
@@ -65,10 +67,19 @@ while i <= length(dimensions)
 end
 
 
-varid = netcdf_defVar(ncid,varname,datatype,dimids);
+varid = netcdf_defVar(ncid,varname,oct2nctype(datatype),dimids);
 
-% TODO use netcdf4 stuff
+if ~isempty(ChunkSize)
+  netcdf_defVarChunking(ncid,varid,'chunked',ChunkSize);
+end
 
+if ~isempty(FillValue)
+  % value of nofill?
+  netcdf_defVarFill(ncid,varid,false,FillValue);
+end
 
+if isnumeric(DeflateLevel)
+  netcdf_defVarDeflate(ncid,varid,Shuffle,true,DeflateLevel);
+end
 
 netcdf_close(ncid);

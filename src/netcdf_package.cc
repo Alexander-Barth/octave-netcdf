@@ -173,7 +173,7 @@ DEFUN_DLD(netcdf_getConstant, args,,
   name = normalize_ncname(name);
 
 #define OV_NETCDF_CONST(nctype,octtype)                 \
-  if (name == std::string("NC_FILL_") + #nctype) \ 
+  if (name == std::string("NC_FILL_") + #nctype) \
   return octave_value(octave_ ## octtype(NC_FILL_ ## nctype));
 
   OV_NETCDF_CONST(BYTE,   int8)
@@ -381,7 +381,11 @@ DEFUN_DLD(netcdf_defDim, args,,
 //                     int ndims, const int dimids[], int *varidp);
 
 DEFUN_DLD(netcdf_defVar, args,, 
-"")
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} {@var{varid} = } netcdf_defVar(@var{ncid},@var{varid},@var{name},@var{xtype},@{dimids}) \n\
+Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyte\", \"short\", \"ushort\", \"int\", \"uint\", \"int64\", \"uint64\", \"float\", \"double\", \"char\" or the corresponding number as returned by netcdf_getConstant. \n\
+@end deftypefn\n\
+@seealso{netcdf_open}\n")
 {
 
   if (args.length() != 4) {
@@ -391,8 +395,16 @@ DEFUN_DLD(netcdf_defVar, args,,
 
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value (); 
-  std::string xtype = args(2).string_value ();
+  int xtype;
   Array<double> tmp;
+
+  if (args(2).is_scalar_type()) {
+    xtype = args(2).scalar_value();
+  }
+  else {
+    xtype = _get_type(args(2).string_value());
+  }
+
 
   if (!args(3).is_empty()) {
     tmp = args(3).vector_value ();  
@@ -408,7 +420,7 @@ DEFUN_DLD(netcdf_defVar, args,,
   int varid;
 
   //cout << "nc " << _get_type(xtype) << endl;
-  check_err(nc_def_var (ncid, name.c_str(), _get_type(xtype), tmp.numel(), dimids, &varid));
+  check_err(nc_def_var (ncid, name.c_str(), xtype, tmp.numel(), dimids, &varid));
 
   return octave_value(varid);
 }

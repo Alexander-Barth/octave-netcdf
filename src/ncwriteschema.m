@@ -60,20 +60,9 @@ for i = 1:length(s.Variables)
     dimids(j) = netcdf_inqDimID(ncid,v.Dimensions(j).Name);
   end
 
-  % define variable
-  switch lower(v.Datatype)
-   case 'int32'
-    dtype = 'int';
-   case 'single'
-    dtype = 'float';
-   case 'double'
-    dtype = 'double';
-   case 'char'
-    dtype = 'char';
-   otherwise
-    error('netcdf:unkownType','unknown type %s',v.Datatype);
-  end  
   
+  % define variable
+  dtype = oct2nctype(v.Datatype);
   varid = netcdf_defVar(ncid,v.Name,dtype,dimids);
   
   % define attributes
