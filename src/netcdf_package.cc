@@ -518,7 +518,7 @@ Renames the dimension with the id @var{dimid} in the data set @var{ncid}. @var{n
 
   int ncid = args(0).scalar_value();
   int dimid = args(1).scalar_value();
-  std::string name = args(1).string_value();
+  std::string name = args(2).string_value();
 
   if (error_state)
     {
@@ -577,6 +577,39 @@ Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyt
   check_err(nc_def_var (ncid, name.c_str(), xtype, tmp.numel(), dimids, &varid));
 
   return octave_value(varid);
+}
+
+
+// int nc_rename_var(int ncid, int varid, const char* name);
+
+
+DEFUN_DLD(netcdf_renameVar, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_renameVar(@var{ncid},@var{varid},@var{name}) \n\
+Renames the variable with the id @var{varid} in the data set @var{ncid}. @var{name} is the new name of the variable.\n\
+@end deftypefn\n\
+@seealso{netcdf_defVar}\n")
+{
+
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string name = args(2).string_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  check_err(nc_rename_var (ncid, varid, name.c_str()));
+
+  return octave_value();
 }
 
 

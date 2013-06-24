@@ -311,5 +311,31 @@ netcdf.close(ncid);
 delete(fname);
 
 
+
+% check rename dimension
+fname = [tempname '-octave-rename-dim.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimid = netcdf.defDim(ncid,'x',123);
+[name,len] = netcdf.inqDim(ncid,dimid);
+assert(strcmp(name,'x'));
+netcdf.renameDim(ncid,dimid,'y');
+[name,len] = netcdf.inqDim(ncid,dimid);
+assert(strcmp(name,'y'));
+delete(fname);
+
+
+% rename variable
+fname = [tempname '-octave-netcdf-rename-var.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','char',dimids);
+[varname] = netcdf.inqVar(ncid,varid);
+assert(strcmp(varname,'double_var'));
+netcdf.renameVar(ncid,varid,'doublev');
+[varname] = netcdf.inqVar(ncid,varid);
+assert(strcmp(varname,'doublev'));
+netcdf.close(ncid);
+delete(fname);
+
 test_netcdf_hl
 
