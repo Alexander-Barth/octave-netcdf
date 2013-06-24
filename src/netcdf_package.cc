@@ -233,7 +233,7 @@ DEFUN_DLD(netcdf_inqLibVers, args,,
 DEFUN_DLD(netcdf_setDefaultFormat, args,, 
 "")
 {
-  if (args.length() != 0) {
+  if (args.length() != 1) {
       print_usage ();
       return octave_value();
     }
@@ -243,6 +243,72 @@ DEFUN_DLD(netcdf_setDefaultFormat, args,,
   check_err(nc_set_default_format(format, &old_format));
 
   return octave_value(old_format);
+}
+
+
+//      int nc_set_chunk_cache(size_t size, size_t nelems, float preemption);
+
+DEFUN_DLD(netcdf_setChunkCache, args,, 
+"-*- texinfo -*-\n\
+@deftypefn netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
+Sets the default chunk cache settins in the HDF5 library. The settings applies to all files which are subsequently opened or created.\n\
+@end deftypefn\n\
+@seealso{netcdf_getChunkCache}\n")
+{
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+  
+  size_t size = args(0).scalar_value();
+  size_t nelems = args(1).scalar_value();
+  float preemption = args(2).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
+  check_err(nc_set_chunk_cache(size, nelems, preemption));
+
+  return octave_value();
+}
+
+
+//      int nc_get_chunk_cache(size_t *sizep, size_t *nelemsp, float *preemptionp);
+
+DEFUN_DLD(netcdf_getChunkCache, args,, 
+"-*- texinfo -*-\n\
+@deftypefn [@var{size}, @var{nelems}, @var{preemption}] = netcdf_getChunkCache() \n\
+Gets the default chunk cache settins in the HDF5 library. \n\
+@end deftypefn\n\
+@seealso{netcdf_setChunkCache}\n")
+{
+  if (args.length() != 0) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+  
+  size_t size;
+  size_t nelems;
+  float preemption;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
+  check_err(nc_get_chunk_cache(&size, &nelems, &preemption));
+  octave_value_list retval;
+  retval(0) = octave_value(size);
+  retval(1) = octave_value(nelems);
+  retval(2) = octave_value(preemption);
+
+  return retval;
 }
 
 
@@ -284,6 +350,61 @@ DEFUN_DLD(netcdf_open, args,,
 }
 
 
+
+DEFUN_DLD(netcdf_abort, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_abort(@var{ncid}) \n\
+Aborts all changes since the last time the dataset entered in define mode.\n\
+@end deftypefn\n\
+@seealso{netcdf_reDef}\n")
+{
+
+  if (args.length() != 1) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(1).scalar_value();
+
+  if (error_state) 
+    {
+      print_usage ();
+      return octave_value();    
+    }
+
+  check_err(nc_abort(ncid));
+
+  return octave_value();
+}
+
+
+DEFUN_DLD(netcdf_sync, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_sync(@var{ncid}) \n\
+Writes all changes to the disk and leaves the file open.\n\
+@end deftypefn\n\
+@seealso{netcdf_close}\n")
+{
+
+  if (args.length() != 1) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(1).scalar_value();
+
+  if (error_state) 
+    {
+      print_usage ();
+      return octave_value();    
+    }
+
+  check_err(nc_sync(ncid));
+
+  return octave_value();
+}
 
 
 //int nc_inq          (int ncid, int *ndimsp, int *nvarsp, int *ngattsp,
@@ -375,6 +496,39 @@ DEFUN_DLD(netcdf_defDim, args,,
   check_err(nc_def_dim (ncid, name.c_str(), len, &dimid));
 
   return octave_value(dimid);
+}
+
+
+// int nc_rename_dim(int ncid, int dimid, const char* name);
+
+
+DEFUN_DLD(netcdf_renameDim, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_renameDim(@var{ncid},@var{dimid},@var{name}) \n\
+Renames the dimension with the id @var{dimid} in the data set @var{ncid}. @var{name} is the new name of the dimension.\n\
+@end deftypefn\n\
+@seealso{netcdf_defDim}\n")
+{
+
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int dimid = args(1).scalar_value();
+  std::string name = args(1).string_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
+  check_err(nc_rename_dim (ncid, dimid, name.c_str()));
+
+  return octave_value();
 }
 
 //  int nc_def_var (int ncid, const char *name, nc_type xtype,
