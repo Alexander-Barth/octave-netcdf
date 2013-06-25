@@ -8,11 +8,11 @@ all: netcdf_package.oct
 
 constants:
 	awk '/\#define[ \t]+NC_[0-9a-zA-Z_]*[ \t]+/ { printf "  constants[\"%s\"] = %s;\n",$$2,$$2 }' $(NCHEADER) | grep -v NC_TURN_OFF_LOGGING | fgrep -v NC_FILL_ > nc_constants.h
-
+	awk -f netcdf_constants.awk /usr/include/netcdf.h  > netcdf_constants.h
 clean:
 	rm netcdf_package.oct
 
-netcdf_package.oct: netcdf_package.cc nc_constants.h
+netcdf_package.oct: netcdf_package.cc nc_constants.h netcdf_constants.h
 	mkoctfile netcdf_package.cc $(LIBS)
 
 PKG_ADD: netcdf_package.cc

@@ -14,8 +14,11 @@ using namespace std;
 typedef std::map<std::string, long long>::const_iterator map_const_iterator;
 std::map<std::string, long long> constants;
 
+std::map<std::string, octave_value> netcdf_constants;
+
 void init() {  
   #include "nc_constants.h"
+  #include "netcdf_constants.h"
 }
 
 void check_err(int status) 
@@ -34,10 +37,15 @@ int _get_constant(std::string name)
   map_const_iterator cst = constants.find(name);
 
   if (cst != constants.end ())
-    return cst->second;
+    {
+      return cst->second;
+    }
   else
-    error("unknown netcdf constant: %s",name.c_str());
+    {
+      error("unknown netcdf constant: %s",name.c_str());
+    }
 }
+
 
 // convert name to upper-case and add "NC_" prefix if it is missing
 std::string normalize_ncname(std::string name) {
@@ -51,6 +59,32 @@ std::string normalize_ncname(std::string name) {
     ncname = prefix + ncname;
   }  
   return ncname;
+}
+
+octave_value netcdf_get_constant(octave_value ov)
+{
+  if (netcdf_constants.empty())
+    {
+      init();
+    }
+
+  if (ov.is_scalar_type())
+    {
+      return ov.scalar_value();
+    }
+
+  std::string name = ov.string_value();
+  name = normalize_ncname(name);
+  std::map<std::string, octave_value>::const_iterator cst = netcdf_constants.find(name);
+
+  if (cst != netcdf_constants.end ())
+    {
+      return cst->second;
+    }
+  else
+    {
+      error("unknown netcdf constant: %s",name.c_str());
+    }
 }
 
 int _get_type(std::string name) 
@@ -162,6 +196,8 @@ DEFUN_DLD(netcdf_getConstant, args,,
       return octave_value();
     }
 
+  return netcdf_get_constant(args(0));
+
   octave_value ov = args(0);
   if (ov.is_scalar_type())
     {
@@ -248,7 +284,7 @@ Sets the default format of the NetCDF library and returns the previous default f
       return octave_value ();
     }
 
-  int format = netcdf_constants_int(args(0));
+  int format = netcdf_get_constant(args(0)).int_value();
   int old_format;
 
   check_err(nc_set_default_format(format, &old_format));
@@ -351,7 +387,7 @@ ncid = netcdf.create(\"test.nc\",mode); \n\
     }
 
   std::string filename = args(0).string_value();
-  int mode = netcdf_constants_int(args(1));
+  int mode = netcdf_get_constant(args(1)).int_value();
   int ncid;
 
   check_err(nc_create(filename.c_str(), mode, &ncid));
@@ -373,7 +409,7 @@ Opens the file named @var{filename} in the mode @var{mode}.\n\
     }
 
   std::string filename = args(0).string_value();
-  int mode = netcdf_constants_int(args(1));
+  int mode = netcdf_get_constant(args(1)).int_value();
   int ncid;
 
   check_err(nc_open(filename.c_str(), mode, &ncid));
@@ -453,7 +489,7 @@ Change the fill mode (@var{fillmode}) of the data set @var{ncid}. The previous v
     }
 
   int ncid = args(0).scalar_value();
-  int fillmode = netcdf_constants_int(args(1));
+  int fillmode = netcdf_get_constant(args(1)).int_value();
   int old_mode;
 
   if (error_state) 
@@ -943,7 +979,7 @@ Defines the checksum settings of the variable with the id @var{varid} in the dat
 
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value();
-  int checksum = netcdf_constants_int(args(2));
+  int checksum = netcdf_get_constant(args(2)).int_value();
 
   if (error_state)
     {
