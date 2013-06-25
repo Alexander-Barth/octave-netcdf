@@ -1567,30 +1567,6 @@ DEFUN_DLD(netcdf_inqDimIDs, args,,
 }
 
 
-DEFUN_DLD(netcdf_inqNVars, args,, 
-"")
-{
-
-  if (args.length() != 1) {
-      print_usage ();
-      return octave_value();
-    }
-
-  int ncid = args(0).scalar_value();
-  octave_value_list retval;
-
-  if (! error_state) {
-    char name[NC_MAX_NAME+1];
-    size_t length;
-    int nvars;
-
-    check_err(nc_inq_nvars(ncid, &nvars));
-    retval(0) = octave_value(nvars);
-  }
-
-  return retval;
-}
-
 
 // groups
 
