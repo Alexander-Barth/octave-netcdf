@@ -27,25 +27,6 @@ void check_err(int status)
 }
 
 
-int _get_constant(std::string name)
-{
-  if (constants.empty())
-    {
-      init();
-    }
-  
-  map_const_iterator cst = constants.find(name);
-
-  if (cst != constants.end ())
-    {
-      return cst->second;
-    }
-  else
-    {
-      error("unknown netcdf constant: %s",name.c_str());
-    }
-}
-
 
 // convert name to upper-case and add "NC_" prefix if it is missing
 std::string normalize_ncname(std::string name) {
@@ -87,23 +68,6 @@ octave_value netcdf_get_constant(octave_value ov)
     }
 }
 
-int _get_type(std::string name) 
-{
-  return _get_constant(normalize_ncname(name));
-}
-
-int netcdf_constants_int(octave_value ov) 
-{
-  if (ov.is_scalar_type())
-    {
-      return ov.scalar_value();
-    }
-  else
-    {
-      std::string name = normalize_ncname(ov.string_value());
-      return _get_constant(name);
-    }
-}
 
 void start_count_stride(int ncid, int varid, octave_value_list args,int len,size_t* start,size_t* count,ptrdiff_t* stride)
 {
@@ -197,36 +161,6 @@ DEFUN_DLD(netcdf_getConstant, args,,
     }
 
   return netcdf_get_constant(args(0));
-
-  octave_value ov = args(0);
-  if (ov.is_scalar_type())
-    {
-      return ov;
-    }
-
-  std::string name = ov.string_value();
-
-  name = normalize_ncname(name);
-
-#define OV_NETCDF_CONST(nctype,octtype)                 \
-  if (name == std::string("NC_FILL_") + #nctype) \
-  return octave_value(octave_ ## octtype(NC_FILL_ ## nctype));
-
-  OV_NETCDF_CONST(BYTE,   int8)
-  OV_NETCDF_CONST(UBYTE,  uint8)
-  OV_NETCDF_CONST(SHORT,  int16)
-  OV_NETCDF_CONST(USHORT, uint16)
-  OV_NETCDF_CONST(INT,    int32)
-  OV_NETCDF_CONST(UINT,   uint32)
-  OV_NETCDF_CONST(INT64,  int64)
-  OV_NETCDF_CONST(UINT64, uint64)
-
-  if (name == "NC_FILL_FLOAT") return octave_value((float)(NC_FILL_FLOAT));
-  if (name == "NC_FILL_DOUBLE") return octave_value((double)(NC_FILL_DOUBLE));
-  if (name == "NC_FILL_STRING") return octave_value(std::string(NC_FILL_STRING));
-  if (name == "NC_FILL_CHAR") return octave_value(std::string(NC_FILL_CHAR));
-
-  return octave_value(_get_constant(name));
 }
 
 
@@ -646,16 +580,8 @@ Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyt
 
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value (); 
-  int xtype;
+  int xtype = netcdf_get_constant(args(2)).int_value();;
   Array<double> tmp;
-
-  if (args(2).is_scalar_type()) {
-    xtype = args(2).scalar_value();
-  }
-  else {
-    xtype = _get_type(args(2).string_value());
-  }
-
 
   if (!args(3).is_empty()) {
     tmp = args(3).vector_value ();  
@@ -670,7 +596,6 @@ Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyt
   
   int varid;
 
-  //cout << "nc " << _get_type(xtype) << endl;
   check_err(nc_def_var (ncid, name.c_str(), xtype, tmp.numel(), dimids, &varid));
 
   return octave_value(varid);
