@@ -146,6 +146,52 @@ test_netcdf_package_type('char','char');
 
 test_scalar_variable
 
+% rename attributes
+
+fname = [tempname '-octave-netcdf-rename-attrib.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+gid = netcdf.getConstant('global');
+netcdf.putAtt(ncid,gid,'toto',int8(123));
+name = netcdf_inqAttName(ncid,gid,0);
+assert(strcmp(name,'toto'));
+netcdf_renameAtt(ncid,gid,'toto','lala');
+name = netcdf.inqAttName(ncid,gid,0);
+assert(strcmp(name,'lala'));
+netcdf.close(ncid);
+delete(fname)
+
+
+% delete attributes
+
+fname = [tempname '-octave-netcdf-delete-attrib.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+gid = netcdf.getConstant('global');
+netcdf.putAtt(ncid,gid,'toto',int8(123));
+varid = netcdf.defVar(ncid,'double_var','double',[]);
+[ndims,nvars,natts] = netcdf.inq(ncid);
+assert(natts == 1);
+netcdf.delAtt(ncid,gid,'toto');
+[ndims,nvars,natts] = netcdf.inq(ncid);
+assert(natts == 0);
+netcdf.close(ncid);
+delete(fname)
+
+% copy attributes
+
+fname = [tempname '-octave-netcdf-copy-attrib.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+gid = netcdf.getConstant('global');
+netcdf.putAtt(ncid,gid,'toto',int8(123));
+varid = netcdf.defVar(ncid,'double_var','double',[]);
+netcdf.copyAtt(ncid,gid,'toto',ncid,varid);
+[ndims,nvars,natts] = netcdf.inq(ncid);
+assert(natts == 1);
+[varname,xtype,dimids,natts] = netcdf.inqVar(ncid,varidd);
+val = netcdf.getAtt(ncid,varidd,'toto');
+assert(isequal(val,123));
+netcdf.close(ncid);
+delete(fname)
+
 
 % test one unlimited dimensions
 fname = [tempname '-octave-netcdf-unlimdim.nc'];

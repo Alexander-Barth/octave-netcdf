@@ -2,8 +2,16 @@
 function val = ncreadatt(filename,varname,attname)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
-varid = netcdf_inqVarID(ncid, varname);
-[varname_,xtype,dimids,natts] = netcdf_inqVar(ncid,varid);
+
+if strcmp(varname,'/') %varname for global attributes
+    varid=netcdf_getConstant('NC_GLOBAL');
+    [~,~,natts]=netcdf_inq(ncid);
+else
+    varid = netcdf_inqVarID(ncid, varname);
+    [~,~,~,natts] = netcdf_inqVar(ncid,varid);
+end;
+
+
 val = [];
 found = 0;
 

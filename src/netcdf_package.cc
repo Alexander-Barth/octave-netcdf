@@ -536,7 +536,7 @@ Renames the dimension with the id @var{dimid} in the data set @var{ncid}. @var{n
 
 DEFUN_DLD(netcdf_defVar, args,, 
 "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} {@var{varid} = } netcdf_defVar(@var{ncid},@var{varid},@var{name},@var{xtype},@{dimids}) \n\
+@deftypefn {Loadable Function} {@var{varid} = } netcdf_defVar(@var{ncid},@var{varid},@var{name},@var{xtype},@var{dimids}) \n\
 Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyte\", \"short\", \"ushort\", \"int\", \"uint\", \"int64\", \"uint64\", \"float\", \"double\", \"char\" or the corresponding number as returned by netcdf_getConstant. \n\
 @end deftypefn\n\
 @seealso{netcdf_open}\n")
@@ -1326,6 +1326,103 @@ DEFUN_DLD(netcdf_putAtt, args,,
 }
 
 
+DEFUN_DLD(netcdf_copyAtt, args,, 
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_copyAtt(@var{ncid},@var{varid},@var{name},@var{ncid_out},@var{varid_out}) \n\
+Copies the attribute named @var{old_name} of the variable @var{varid} in the data set @var{ncid} to the variable @var{varid_out} in the data set @var{ncid_out}. \n\
+To copy a global attribute use netcdf_getConstant(\"global\") for @var{varid} or @var{varid_out}.\n\
+@end deftypefn\n\
+@seealso{netcdf_defAtt,netcdf_getConstant}\n")
+{
+
+  if (args.length() != 5) 
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string name = args(2).string_value();
+  int ncid_out = args(3).scalar_value();
+  int varid_out = args(4).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  check_err (nc_copy_att (ncid, varid, name.c_str(),
+			  ncid_out, varid_out));
+
+  return octave_value ();
+}
+
+
+DEFUN_DLD(netcdf_renameAtt, args,, 
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_renameAtt(@var{ncid},@var{varid},@var{old_name},@var{new_name}) \n\
+Renames the attribute named @var{old_name} of the variable @var{varid} in the data set @var{ncid}. @var{new_name} is the new name of the attribute.\n\
+To rename a global attribute use netcdf_getConstant(\"global\") for @var{varid}.\n\
+@end deftypefn\n\
+@seealso{netcdf_defAtt,netcdf_getConstant}\n")
+{
+
+  if (args.length() != 4) 
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string old_name = args(2).string_value();
+  std::string new_name = args(3).string_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  check_err(nc_rename_att (ncid, varid, old_name.c_str(), new_name.c_str()));
+
+  return octave_value ();
+}
+
+
+DEFUN_DLD(netcdf_delAtt, args,, 
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_delAtt(@var{ncid},@var{varid},@var{name}) \n\
+Deletes the attribute named @var{name} of the variable @var{varid} in the data set @var{ncid}. \n\
+To delete a global attribute use netcdf_getConstant(\"global\") for @var{varid}.\n\
+@end deftypefn\n\
+@seealso{netcdf_defAtt,netcdf_getConstant}\n")
+{
+
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string name = args(2).string_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  check_err(nc_del_att (ncid, varid, name.c_str()));
+
+  return octave_value ();
+}
+
+
 DEFUN_DLD(netcdf_inqVarID, args,, 
 "")
 {
@@ -1350,7 +1447,8 @@ DEFUN_DLD(netcdf_inqVar, args,,
 "")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1362,25 +1460,34 @@ DEFUN_DLD(netcdf_inqVar, args,,
   nc_type xtype;
   octave_value_list retval;
 
-  if (! error_state) {
-
-    check_err(nc_inq_varndims(ncid, varid, &ndims));
+  if (error_state) 
+    {
+      print_usage ();      
+      return octave_value();
+    }
     
-    check_err(nc_inq_var(ncid, varid, name, &xtype,
-			 &ndims, dimids, &natts));
+  check_err(nc_inq_varndims(ncid, varid, &ndims));
     
-    retval(0) = octave_value(std::string(name));
-    retval(1) = octave_value(xtype);
+  if (error_state) 
+    {
+      return octave_value();
+    }
 
-    // copy output arguments
-    Array<double> dimids_ = Array<double>(dim_vector(1,ndims));
-    for (int i = 0; i < ndims; i++) {
+  check_err(nc_inq_var(ncid, varid, name, &xtype,
+		       &ndims, dimids, &natts));
+    
+  retval(0) = octave_value(std::string(name));
+  retval(1) = octave_value(xtype);
+
+  // copy output arguments
+  Array<double> dimids_ = Array<double>(dim_vector(1,ndims));
+  for (int i = 0; i < ndims; i++) 
+    {
       dimids_(i) = dimids[ndims-i-1];
     }
 
-    retval(2) = octave_value(dimids_);
-    retval(3) = octave_value(natts);
-  }
+  retval(2) = octave_value(dimids_);
+  retval(3) = octave_value(natts);
 
   return retval;
 }
