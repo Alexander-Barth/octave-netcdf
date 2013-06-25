@@ -1218,6 +1218,8 @@ Close the NetCDF file with the id @var{ncid}.\n\
   return octave_value ();
 }
 
+
+
 //  int nc_inq_attname(int ncid, int varid, int attnum, char *name);
 
 DEFUN_DLD(netcdf_inqAttName, args,, 
@@ -1237,6 +1239,36 @@ DEFUN_DLD(netcdf_inqAttName, args,,
 
   return octave_value(std::string(name));  
 }
+
+
+DEFUN_DLD(netcdf_inqAttID, args,, 
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{attnum} = netcdf_inqAttID(@var{ncid},@var{varid},@var{attname}) \n\
+Returns the attribute id @var{attnum} of the attribute named @var{attname} of the variable @var{varid} in the dataset @var{ncid}. \n\
+@end deftypefn\n\
+@seealso{netcdf_inqAttName}\n")
+{
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value ();
+    }
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  std::string attname = args(2).string_value();
+  int attnum;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value ();
+    }
+
+  check_err (nc_inq_attid (ncid, varid, attname.c_str(), &attnum));
+
+  return octave_value(attnum);
+}
+
 
 //int nc_inq_att    (int ncid, int varid, const char *name,
 //                        nc_type *xtypep, size_t *lenp);

@@ -192,6 +192,19 @@ assert(isequal(val,123));
 netcdf.close(ncid);
 delete(fname)
 
+% attributes id
+
+fname = [tempname '-octave-netcdf-delete-attrib.nc'];
+ncid = netcdf.create(fname,'NC_CLOBBER');
+gid = netcdf.getConstant('global');
+netcdf.putAtt(ncid,gid,'toto',int8(123));
+attnum = netcdf.inqAttID(ncid,gid,'toto');
+name = netcdf.inqAttName(ncid,gid,attnum);
+assert(strcmp(name,'toto'))
+netcdf.close(ncid);
+delete(fname)
+
+
 
 % test one unlimited dimensions
 fname = [tempname '-octave-netcdf-unlimdim.nc'];
