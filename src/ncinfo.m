@@ -127,6 +127,12 @@ if ~deflate
 end
 vinfo.Shuffle = shuffle;
 
+# add checksum information if defined (unlike matlab)
+checksum = netcdf_inqVarFletcher32(ncid,varid);
+if ~strcmp(checksum,'nochecksum');
+  vinfo.Checksum = checksum;
+end
+
 end
 
 

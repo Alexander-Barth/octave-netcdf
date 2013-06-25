@@ -865,6 +865,75 @@ DEFUN_DLD(netcdf_inqVarChunking, args,,
   return retval;
 }
 
+// nc_def_var_fletcher32(int ncid, int varid, int checksum);
+DEFUN_DLD(netcdf_defVarFletcher32, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_defVarFletcher32(@var{ncid},@var{varid},@var{checksum}) \n\
+Defines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If @var{checksum} is the string \"fletcher32\", then fletcher32 checksums will be turned on for this variable. If @var{checksum} is \"nochecksum\", then checksums will be disabled. \n\
+@end deftypefn\n\
+@seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
+{
+
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int checksum = netcdf_constants_int(args(2));
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  check_err(nc_def_var_fletcher32(ncid, varid, checksum));
+
+  return octave_value();
+}
+
+
+
+DEFUN_DLD(netcdf_inqVarFletcher32, args,, 
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{checksum} = netcdf_inqVarFletcher32(@var{ncid},@var{varid}) \n\
+Determines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If fletcher32 checksums is turned on for this variable, then @var{checksum} is the string \"fletcher32\". Otherwise it is the string \"nochecksum\". \n\
+@end deftypefn\n\
+@seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
+{
+
+  if (args.length() != 2) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int varid = args(1).scalar_value();
+  int checksum;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  check_err(nc_inq_var_fletcher32(ncid, varid, &checksum));
+
+  if (checksum == NC_FLETCHER32) 
+    {
+      return octave_value("fletcher32");
+    }
+  else 
+    {
+      return octave_value("nochecksum");
+    }  
+}
+
+
 
 DEFUN_DLD(netcdf_endDef, args,, 
 "")

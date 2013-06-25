@@ -70,14 +70,52 @@ for i = 1:length(s.Variables)
     netcdf_putAtt(ncid,varid,v.Attributes(j).Name,v.Attributes(j).Value);
   end
   
+  % define chunk size
   if isfield(v,'ChunkSize')
     if ~isempty(v.ChunkSize)
       netcdf_defVarChunking(ncid,varid,'chunked',v.ChunkSize);
     end
   end
-end
 
-%vinfo.FillValue
+  % define compression
+  shuffle = false;
+  deflatelevel = 0;
+
+  if isfield(v,'Shuffle') 
+    if ~isempty(v.Shuffle)    
+      shuffle = v.Shuffle;
+    end
+  end
+  
+  if isfield(v,'DeflateLevel')
+    if ~isempty(v.DeflateLevel)
+      deflatelevel = v.DeflateLevel;
+    end
+  end
+  
+  if shuffle && defaltelevel != 0
+    deflate = defaltelevel != 0;
+    netcdf_defVarDeflate(ncid,varid,shuffle,deflate,deflatelevel);
+  end
+    
+  % define fill value
+  if isfield(v,'FillValue')
+    if ~isempty(v.FillValue)
+      % leave nofill setting unchanged
+      [nofill,fillval] = netcdf_inqVarFill(ncid,varid);      
+      netcdf_defVarFill(ncid,varid,nofill,v.FillValue);
+    end
+  end
+
+  % define checksum
+  if isfield(v,'Checksum')
+    if ~isempty(v.Checksum)
+      netcdf_defVarFletcher32(ncid,varid,v.Checksum);
+    end
+  end
+  
+  
+end
 
 % groups
 if isfield(s,'Groups')

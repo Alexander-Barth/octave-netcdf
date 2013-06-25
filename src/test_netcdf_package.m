@@ -227,6 +227,21 @@ netcdf.close(ncid);
 delete(fname);
 
 
+% checksum
+fname = [tempname '-octave-netcdf-checksum.nc'];
+ncid = netcdf.create(fname,'NC_NETCDF4');
+dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+checksum = netcdf.inqVarFletcher32(ncid,varid);
+assert(strcmp(checksum,'nochecksum'))
+netcdf.defVarFletcher32(ncid,varid,'fletcher32');
+checksum = netcdf.inqVarFletcher32(ncid,varid);
+assert(strcmp(checksum,'fletcher32'))
+netcdf.close(ncid);
+%system(['ncdump -h ' fname])
+delete(fname);
+
+
 % variable fill
 fname = [tempname '-octave-netcdf-fill.nc'];
 ncid = netcdf.create(fname,'NC_NETCDF4');
@@ -336,6 +351,8 @@ netcdf.renameVar(ncid,varid,'doublev');
 assert(strcmp(varname,'doublev'));
 netcdf.close(ncid);
 delete(fname);
+
+
 
 test_netcdf_hl
 
