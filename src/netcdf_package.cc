@@ -1538,7 +1538,24 @@ DEFUN_DLD(netcdf_inqVarID, args,,
   return octave_value(varid);
 }
 
+DEFUN_DLD(netcdf_inqVarIDs, args,, 
+"")
+{
 
+  if (args.length() != 1) {
+      print_usage ();
+      return octave_value ();
+    }
+
+  int ncid = args(0).scalar_value();
+  int nvars;
+
+  check_err(nc_inq_varids(ncid, &nvars, NULL));
+  Array<int> varids = Array<int>(dim_vector(1,nvars));
+  check_err(nc_inq_varids(ncid, &nvars, varids.fortran_vec()));
+
+  return octave_value(varids);
+}
 
 DEFUN_DLD(netcdf_inqVar, args,, 
 "")
