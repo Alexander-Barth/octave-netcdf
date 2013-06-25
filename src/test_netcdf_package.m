@@ -203,6 +203,16 @@ netcdf.close(ncid);
 delete(fname)
 
 
+% test netcdf_classic format
+fname = [tempname '-octave-netcdf-classic-model.nc'];
+mode =  bitor(netcdf.getConstant('classic_model'),netcdf.getConstant('netcdf4'));
+ncid = netcdf.create(fname,mode);
+netcdf.close(ncid);
+info = ncinfo(fname);
+assert(strcmp(info.Format,'netcdf4_classic'));
+delete(fname);
+
+
 % test two unlimited dimensions
 fname = [tempname '-octave-netcdf-2unlimdim.nc'];
 mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
@@ -211,6 +221,17 @@ dimID = netcdf.defDim(ncid,'time',netcdf.getConstant('NC_UNLIMITED'));
 dimID2 = netcdf.defDim(ncid,'time2',netcdf.getConstant('NC_UNLIMITED'));
 unlimdimIDs = netcdf.inqUnlimDims(ncid);
 assert(isequal(sort([dimID,dimID2]),sort(unlimdimIDs)));
+netcdf.close(ncid);
+delete(fname);
+
+
+% test fill mode
+fname = [tempname '-octave-netcdf-fill-mode.nc'];
+mode =  bitor(netcdf.getConstant('NC_CLOBBER'),netcdf.getConstant('NC_NETCDF4'));
+ncid = netcdf.create(fname,mode);
+old_mode = netcdf.setFill(ncid,'nofill');
+old_mode = netcdf.setFill(ncid,'nofill');
+assert(old_mode == netcdf.getConstant('nofill'))
 netcdf.close(ncid);
 delete(fname);
 

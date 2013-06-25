@@ -220,23 +220,34 @@ DEFUN_DLD(netcdf_getConstantNames, args,,
 
 
 DEFUN_DLD(netcdf_inqLibVers, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn @var{vers} = netcdf_inqLibVers() \n\
+Returns the vers of the NetCDF library.\n\
+@end deftypefn\n\
+@seealso{netcdf_open}\n")
 {
   if (args.length() != 0) {
       print_usage ();
-      return octave_value();
+      return octave_value ();
     }
 
-  return octave_value(string(nc_inq_libvers()));
+  return octave_value(std::string(nc_inq_libvers()));
 }
 
 DEFUN_DLD(netcdf_setDefaultFormat, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{old_format} = netcdf_setDefaultFormat(@var{format}) \n\
+Sets the default format of the NetCDF library and returns the previous default format (as a numeric value). @var{format} can be \n\
+\"format_classic\", \"format_64bit\",  \"format_netcdf4\" or \"format_netcdf4_classic\". \n\
+@end deftypefn\n\
+@seealso{netcdf_open}\n")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
-      return octave_value();
+      return octave_value ();
     }
+
   int format = netcdf_constants_int(args(0));
   int old_format;
 
@@ -249,7 +260,7 @@ DEFUN_DLD(netcdf_setDefaultFormat, args,,
 //      int nc_set_chunk_cache(size_t size, size_t nelems, float preemption);
 
 DEFUN_DLD(netcdf_setChunkCache, args,, 
-"-*- texinfo -*-\n\
+  "-*- texinfo -*-\n\
 @deftypefn netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
 Sets the default chunk cache settins in the HDF5 library. The settings applies to all files which are subsequently opened or created.\n\
 @end deftypefn\n\
@@ -280,7 +291,7 @@ Sets the default chunk cache settins in the HDF5 library. The settings applies t
 //      int nc_get_chunk_cache(size_t *sizep, size_t *nelemsp, float *preemptionp);
 
 DEFUN_DLD(netcdf_getChunkCache, args,, 
-"-*- texinfo -*-\n\
+  "-*- texinfo -*-\n\
 @deftypefn [@var{size}, @var{nelems}, @var{preemption}] = netcdf_getChunkCache() \n\
 Gets the default chunk cache settins in the HDF5 library. \n\
 @end deftypefn\n\
@@ -289,7 +300,7 @@ Gets the default chunk cache settins in the HDF5 library. \n\
   if (args.length() != 0) 
     {
       print_usage ();
-      return octave_value();
+      return octave_value ();
     }
   
   size_t size;
@@ -314,12 +325,29 @@ Gets the default chunk cache settins in the HDF5 library. \n\
 
 
 DEFUN_DLD(netcdf_create, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{ncid} = netcdf_create(@var{filename},@var{mode}) \n\
+Creates the file named @var{filename} in the mode @var{mode} which can have the \n\
+following values: \n\
+\"clobber\" (overwrite existing files), \n\
+\"noclobber\" (prevent to overwrite existing files) \n\
+\"64bit_offset\" (use the 64bit-offset format), \n\
+\"netcdf4\" (use the NetCDF4, i.e. HDF5 format) or \n\
+\"share\" (concurrent reading of the dataset). \n\
+@var{mode} can also be the numeric value return by netcdf_getConstant. In the later-case it can be combined with a bitwise-or. \n\
+@end deftypefn\n\
+Example: \n\
+@example \n\
+mode =  bitor(netcdf.getConstant(\"classic_model\"), ...\n\
+               netcdf.getConstant(\"netcdf4\")); \n\
+ncid = netcdf.create(\"test.nc\",mode); \n\
+@seealso{netcdf_close}\n")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
-      return octave_value();
+      return octave_value ();
     }
 
   std::string filename = args(0).string_value();
@@ -332,7 +360,11 @@ DEFUN_DLD(netcdf_create, args,,
 }
 
 DEFUN_DLD(netcdf_open, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{ncid} = netcdf_open(@var{filename},@var{mode}) \n\
+Opens the file named @var{filename} in the mode @var{mode}.\n\
+@end deftypefn\n\
+@seealso{netcdf_close}\n")
 {
 
   if (args.length() != 2) {
@@ -352,7 +384,7 @@ DEFUN_DLD(netcdf_open, args,,
 
 
 DEFUN_DLD(netcdf_abort, args,, 
-"-*- texinfo -*-\n\
+  "-*- texinfo -*-\n\
 @deftypefn {Loadable Function} netcdf_abort(@var{ncid}) \n\
 Aborts all changes since the last time the dataset entered in define mode.\n\
 @end deftypefn\n\
@@ -365,7 +397,7 @@ Aborts all changes since the last time the dataset entered in define mode.\n\
       return octave_value();
     }
 
-  int ncid = args(1).scalar_value();
+  int ncid = args(0).scalar_value();
 
   if (error_state) 
     {
@@ -380,7 +412,7 @@ Aborts all changes since the last time the dataset entered in define mode.\n\
 
 
 DEFUN_DLD(netcdf_sync, args,, 
-"-*- texinfo -*-\n\
+  "-*- texinfo -*-\n\
 @deftypefn {Loadable Function} netcdf_sync(@var{ncid}) \n\
 Writes all changes to the disk and leaves the file open.\n\
 @end deftypefn\n\
@@ -393,7 +425,7 @@ Writes all changes to the disk and leaves the file open.\n\
       return octave_value();
     }
 
-  int ncid = args(1).scalar_value();
+  int ncid = args(0).scalar_value();
 
   if (error_state) 
     {
@@ -404,6 +436,35 @@ Writes all changes to the disk and leaves the file open.\n\
   check_err(nc_sync(ncid));
 
   return octave_value();
+}
+
+DEFUN_DLD(netcdf_setFill, args,, 
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{old_mode} = netcdf_setFill(@var{ncid},@var{fillmode}) \n\
+Change the fill mode (@var{fillmode}) of the data set @var{ncid}. The previous value of the fill mode is returned. @var{fillmode} can be either \"fill\" or \"nofill\".\n\
+@end deftypefn\n\
+@seealso{netcdf_open}\n")
+{
+
+  if (args.length() != 2) 
+    {
+      print_usage ();
+      return octave_value();
+    }
+
+  int ncid = args(0).scalar_value();
+  int fillmode = netcdf_constants_int(args(1));
+  int old_mode;
+
+  if (error_state) 
+    {
+      print_usage ();
+      return octave_value();    
+    }
+
+  check_err (nc_set_fill (ncid, fillmode, &old_mode));
+
+  return octave_value(old_mode);
 }
 
 
@@ -1140,7 +1201,11 @@ start: 0-based indexes \n\
 }
 
 DEFUN_DLD(netcdf_close, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_close(@var{ncid}) \n\
+Close the NetCDF file with the id @var{ncid}.\n\
+@end deftypefn\n\
+@seealso{netcdf_open}\n")
 {
 
   if (args.length() != 1) {
@@ -1150,7 +1215,7 @@ DEFUN_DLD(netcdf_close, args,,
 
   int ncid = args(0).scalar_value();
   check_err(nc_close(ncid));
-  return octave_value(ncid);
+  return octave_value ();
 }
 
 //  int nc_inq_attname(int ncid, int varid, int attnum, char *name);
