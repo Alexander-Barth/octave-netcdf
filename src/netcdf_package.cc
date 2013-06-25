@@ -9,15 +9,9 @@
 #include <algorithm>
 #include <vector>
 
-using namespace std;
-
-typedef std::map<std::string, long long>::const_iterator map_const_iterator;
-std::map<std::string, long long> constants;
-
 std::map<std::string, octave_value> netcdf_constants;
 
 void init() {  
-  #include "nc_constants.h"
   #include "netcdf_constants.h"
 }
 
@@ -25,8 +19,6 @@ void check_err(int status)
 {
   if (status != NC_NOERR) error("%s",nc_strerror(status));
 }
-
-
 
 // convert name to upper-case and add "NC_" prefix if it is missing
 std::string normalize_ncname(std::string name) {
@@ -174,15 +166,13 @@ DEFUN_DLD(netcdf_getConstantNames, args,,
       return octave_value();
     }
 
-  Cell c = Cell (dim_vector(1,constants.size()));
-  //Cell c = Cell ();
-  int i = 0;
-  for (map_const_iterator p = constants.begin (); p != constants.end (); p++) {
-    //std::cout << "val " << p->first << p->second << std::endl;
-    c(i++) = octave_value(p->first);
-  }
+  Cell c = Cell (dim_vector(1,netcdf_constants.size()));
 
-  
+  int i = 0;
+  for (std::map<std::string, octave_value>::const_iterator p = netcdf_constants.begin (); 
+       p != netcdf_constants.end (); p++) {
+    c(i++) = octave_value(p->first);
+  }  
 
   return octave_value(c);
 
@@ -1144,20 +1134,6 @@ start: 0-based indexes \n\
 
     }
 
-  /*
-  if (xtype == NC_DOUBLE)
-    {
-      Array < double > arr = Array < double >(sliced_dim_vector);
-      check_err(nc_get_vars_double(ncid, varid, start, count, stride, arr.fortran_vec()));
-      data = octave_value(arr);
-    }
-  else if (xtype == NC_FLOAT)
-    {
-      Array < float > arr = Array < float >(sliced_dim_vector);
-      check_err(nc_get_vars_float(ncid, varid, start, count, stride, arr.fortran_vec()));
-      data = octave_value(arr);
-    }
-  */
   return data;
 }
 

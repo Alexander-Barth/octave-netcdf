@@ -10,6 +10,9 @@ assert(strcmp(netcdf.inqFormat(ncid),'FORMAT_CLASSIC'));
 unlimdimIDs = netcdf.inqUnlimDims(ncid);
 assert(isempty(unlimdimIDs));
 
+names = netcdf.getConstantNames();
+assert(any(strcmp(names,'NC_WRITE')));
+
 assert(netcdf.getConstant('NC_NOWRITE') == 0)
 assert(netcdf.getConstant('NC_WRITE') == 1)
 
