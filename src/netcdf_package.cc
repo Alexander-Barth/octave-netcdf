@@ -145,7 +145,11 @@ void start_count_stride(int ncid, int varid, octave_value_list args,int len,size
 
 
 DEFUN_DLD(netcdf_getConstant, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{value} = netcdf_getConstant(@var{name}) \n\
+Returns the value of a NetCDF constant called @var{name}.\n\
+@end deftypefn\n\
+@seealso{netcdf_getConstantNames}\n")
 {
   if (args.length() != 1) {
       print_usage ();
@@ -157,9 +161,12 @@ DEFUN_DLD(netcdf_getConstant, args,,
 
 
 DEFUN_DLD(netcdf_getConstantNames, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{value} = netcdf_getConstantNames() \n\
+Returns a list of all constant names.\n\
+@end deftypefn\n\
+@seealso{netcdf_getConstant}\n")
 {
-
 
   if (args.length() != 0) {
       print_usage ();
@@ -181,8 +188,8 @@ DEFUN_DLD(netcdf_getConstantNames, args,,
 
 DEFUN_DLD(netcdf_inqLibVers, args,, 
   "-*- texinfo -*-\n\
-@deftypefn @var{vers} = netcdf_inqLibVers() \n\
-Returns the vers of the NetCDF library.\n\
+@deftypefn {Loadable Function} @var{vers} = netcdf_inqLibVers() \n\
+Returns the version of the NetCDF library.\n\
 @end deftypefn\n\
 @seealso{netcdf_open}\n")
 {
@@ -221,7 +228,7 @@ Sets the default format of the NetCDF library and returns the previous default f
 
 DEFUN_DLD(netcdf_setChunkCache, args,, 
   "-*- texinfo -*-\n\
-@deftypefn netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
+@deftypefn {Loadable Function} netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
 Sets the default chunk cache settins in the HDF5 library. The settings applies to all files which are subsequently opened or created.\n\
 @end deftypefn\n\
 @seealso{netcdf_getChunkCache}\n")
@@ -252,7 +259,7 @@ Sets the default chunk cache settins in the HDF5 library. The settings applies t
 
 DEFUN_DLD(netcdf_getChunkCache, args,, 
   "-*- texinfo -*-\n\
-@deftypefn [@var{size}, @var{nelems}, @var{preemption}] = netcdf_getChunkCache() \n\
+@deftypefn {Loadable Function} [@var{size}, @var{nelems}, @var{preemption}] = netcdf_getChunkCache() \n\
 Gets the default chunk cache settins in the HDF5 library. \n\
 @end deftypefn\n\
 @seealso{netcdf_setChunkCache}\n")
@@ -431,7 +438,13 @@ Change the fill mode (@var{fillmode}) of the data set @var{ncid}. The previous v
 //int nc_inq          (int ncid, int *ndimsp, int *nvarsp, int *ngattsp,
 //                          int *unlimdimidp);
 DEFUN_DLD(netcdf_inq, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} [@var{ndims},@var{nvars},@var{ngatts},@var{unlimdimid}] = netcdf_inq(@var{ncid}) \n\
+Return the number of dimension (@var{ndims}), the number of variables (@var{nvars}), the number of global attributes (@var{ngatts}) and the id of the unlimited dimension (@var{unlimdimid}). \n\
+If no unlimited dimension is declared -1 is returned. For NetCDF4 files, one should use \n\
+the function netcdf_inqUnlimDims as multiple unlimite dimension exists. \n\
+@end deftypefn\n\
+@seealso{netcdf_inqUnlimDims}\n")
 {
   if (args.length() != 1) {
       print_usage ();
@@ -453,7 +466,11 @@ DEFUN_DLD(netcdf_inq, args,,
 
 // int nc_inq_unlimdims(int ncid, int *nunlimdimsp, int *unlimdimidsp);
 DEFUN_DLD(netcdf_inqUnlimDims, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{unlimdimids} = netcdf_inqUnlimDims(@var{ncid}) \n\
+Return the id of all unlimited dimensions of the NetCDF file @var{ncid}.\n\
+@end deftypefn\n\
+@seealso{netcdf_inq}\n")
 {
   if (args.length() != 1) {
       print_usage ();
@@ -473,7 +490,13 @@ DEFUN_DLD(netcdf_inqUnlimDims, args,,
 
 // int nc_inq_format   (int ncid, int *formatp);
 DEFUN_DLD(netcdf_inqFormat, args,, 
-"")
+  "-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{format} = netcdf_inqFormat(@var{ncid}) \n\
+Return the NetCDF format of the dataset @var{ncid}.\n\
+Format might be one of the following \n\
+\"FORMAT_CLASSIC\", \"FORMAT_64BIT\", \"FORMAT_NETCDF4\" or \"FORMAT_NETCDF4_CLASSIC\" \n\
+@end deftypefn\n\
+@seealso{netcdf_inq}\n")
 {
 
   if (args.length() != 1) {
@@ -501,7 +524,11 @@ DEFUN_DLD(netcdf_inqFormat, args,,
 // int nc_def_dim (int ncid, const char *name, size_t len, int *dimidp);
 
 DEFUN_DLD(netcdf_defDim, args,, 
-"")
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} @var{dimid} = netcdf_defDim(@var{ncid},@var{name},@var{len}) \n\
+Define the dimension with the name @var{name} and the length @var{len} in the dataset @var{ncid}. The id of the dimension is returned.\n\
+@end deftypefn\n\
+@seealso{netcdf_defVar}\n")
 {
 
   if (args.length() != 3) {
@@ -557,10 +584,10 @@ Renames the dimension with the id @var{dimid} in the data set @var{ncid}. @var{n
 
 DEFUN_DLD(netcdf_defVar, args,, 
 "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} {@var{varid} = } netcdf_defVar(@var{ncid},@var{varid},@var{name},@var{xtype},@var{dimids}) \n\
-Defines a variable with the name @var{name}. @var{xtype} can be \"byte\", \"ubyte\", \"short\", \"ushort\", \"int\", \"uint\", \"int64\", \"uint64\", \"float\", \"double\", \"char\" or the corresponding number as returned by netcdf_getConstant. \n\
+@deftypefn {Loadable Function} {@var{varid} = } netcdf_defVar(@var{ncid},@var{name},@var{xtype},@var{dimids}) \n\
+Defines a variable with the name @var{name} in the dataset @var{ncid}. @var{xtype} can be \"byte\", \"ubyte\", \"short\", \"ushort\", \"int\", \"uint\", \"int64\", \"uint64\", \"float\", \"double\", \"char\" or the corresponding number as returned by netcdf_getConstant. The parameter @var{dimids} define the ids of the dimension. For scalar this parameter is the empty array ([]). The variable id is returned. \n\
 @end deftypefn\n\
-@seealso{netcdf_open}\n")
+@seealso{netcdf_open,netcdf_defDim}\n")
 {
 
   if (args.length() != 4) {
@@ -627,7 +654,12 @@ Renames the variable with the id @var{varid} in the data set @var{ncid}. @var{na
 
 // int nc_def_var_fill(int ncid, int varid, int no_fill, void *fill_value);
 DEFUN_DLD(netcdf_defVarFill, args,, 
-"")
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} netcdf_defVarFill(@var{ncid},@var{varid},@var{no_fill},@var{fillvalue}) \n\
+Define the fill-value settings of the NetCDF variable @var{varid}.\n\
+If @var{no_fill} is false, then the values between no-contiguous writes are filled with the value @var{fill_value}. This is disabled by setting @var{no_fill} to true.\n\
+@end deftypefn\n\
+@seealso{netcdf_inqVarFill}\n")
 {
 
   if (args.length() != 4) {
