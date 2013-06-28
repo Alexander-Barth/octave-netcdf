@@ -17,13 +17,25 @@
 ## @deftypefn  {Function File} {@var{x} =} ncread (@var{filename}, @var{varname})
 ## @deftypefnx  {Function File} {@var{x} =} ncread (@var{filename}, @var{varname},@var{start},@var{count},@var{stride})
 ##
-## Read the variable @var{varname} from file @var{filename}.
-## The parameter @var{start} contains the starting indices, @var{count}
-## is the number of elements and @var{stride} the increment between
-## two successive elements. If those parameters are not present, the entire variable is loaded.
+## Read the variable @var{varname} from the NetCDF file @var{filename}.
 ##
-## If the variable as the _FillValue attribute, then the corresponding values
-## are replaced by NaN.
+## If @var{start},@var{count} and @var{stride} are present, a subset of the 
+## variable is loaded. The parameter @var{start} contains the starting indices 
+## (1-based), @var{count} is the number of elements and @var{stride} the 
+## increment between two successive elements. These parameters are vectors whose
+## length is equal to the number of dimension of the variable. Elements of 
+## @var{count} might be Inf which means that as many values as possible are 
+## loaded.
+##
+## If the variable has the _FillValue attribute, then the corresponding values
+## are replaced by NaN. NetCDF attributes scale_factor (default 1) and 
+## add_oddset (default 0) are use the transform the variable during the loading:
+##
+## x = scale_factor * x_in_file + add_offset
+##
+## @seealso{ncwrite,ncinfo,ncdisp}
+##
+## @end deftypefn
 
 function x = ncread(filename,varname,start,count,stride)
 

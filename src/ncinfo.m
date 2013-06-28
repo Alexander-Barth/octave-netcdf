@@ -1,19 +1,35 @@
-% Information about complete NetCDF file or variable.
-%
-% finfo = ncinfo(filename)
-% vinfo = ncinfo(filename,varname)
-% return information about complete NetCDF file (filename) or about
-% the specific variable varname.
-%
-% vinfo.Size: the size of the netcdf variable. For vectors the Size field
-%   has only one element.
-%
-% Note: If there are no attributes (or variable or groups), the corresponding 
-% field is an empty matrix and not an empty struct array for compability
-% with matlab.
-% 
-%
-%
+## Copyright (C) 2013 Alexander Barth
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; If not, see <http://www.gnu.org/licenses/>.
+
+## -*- texinfo -*-
+## @deftypefn  {Function File} @var{finfo} = ncinfo (@var{filename})
+## @deftypefnx  {Function File} @var{vinfo} = ncinfo (@var{filename}, @var{varname})
+## return information about complete NetCDF file @var{filename} or about
+## the specific variable @var{varname}.
+##
+## vinfo.Size: the size of the netcdf variable. For vectors the Size field
+##   has only one element.
+##
+## Note: If there are no attributes (or variable or groups), the corresponding 
+## field is an empty matrix and not an empty struct array for compability
+## with matlab.
+##
+## @seealso{ncread,nccreate}
+##
+## @end deftypefn
+
 function info = ncinfo(filename,varname)
 
 ncid = netcdf_open(filename,'NC_NOWRITE');
