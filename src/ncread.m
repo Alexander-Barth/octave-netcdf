@@ -29,9 +29,13 @@
 ##
 ## If the variable has the _FillValue attribute, then the corresponding values
 ## are replaced by NaN. NetCDF attributes scale_factor (default 1) and 
-## add_oddset (default 0) are use the transform the variable during the loading:
+## add_offset (default 0) are use the transform the variable during the loading:
 ##
 ## x = scale_factor * x_in_file + add_offset
+##
+## The output data type matches the NetCDF datatype, except when the attributes
+## _FillValue, add_offset or scale_factor are defined in which case the output 
+## is a array in double precision.
 ##
 ## @seealso{ncwrite,ncinfo,ncdisp}
 ##
@@ -77,7 +81,7 @@ fv = [];
 
 for i = 0:natts-1
   attname = netcdf_inqAttName(gid,varid,i);
-%  attname
+
   if strcmp(attname,'scale_factor')
     factor = netcdf_getAtt(gid,varid,'scale_factor');
   elseif strcmp(attname,'add_offset')
@@ -87,15 +91,21 @@ for i = 0:natts-1
   end    
 end
 
-if ~isempty(fv)
+if !isempty(factor) || !isempty(factor) || !isempty(offset)
+  if !isa(x,'double')
+    x = double(x);
+  end
+end
+
+if !isempty(fv)
   x(x == fv) = NaN;
 end
 
-if ~isempty(factor)
+if !isempty(factor)
   x = x * factor;
 end
 
-if ~isempty(offset)
+if !isempty(offset)
   x = x + offset;
 end
 
