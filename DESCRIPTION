@@ -7,5 +7,5 @@ Title: netcdf
 Description: A MATLAB compatible NetCDF interface for Octave
 Depends: octave (>= 3.4.0)
 BuildRequires: netcdf-devel
-License: GPLv3+
+License: GPLv2+
 Url: http://octave.sf.net
