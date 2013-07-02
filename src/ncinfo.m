@@ -14,41 +14,137 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} @var{finfo} = ncinfo (@var{filename})
-## @deftypefnx  {Function File} @var{vinfo} = ncinfo (@var{filename}, @var{varname})
-## return information about complete NetCDF file @var{filename} or about
-## the specific variable @var{varname}.
+## @deftypefn  {Function File} @var{info} = ncinfo (@var{filename})
+## @deftypefnx  {Function File} @var{info} = ncinfo (@var{filename}, @var{varname})
+## @deftypefnx  {Function File} @var{info} = ncinfo (@var{filename}, @var{groupname})
+## return information about an entire NetCDF file @var{filename} (i.e. the root 
+## group "/"), about the variable called @var{varname} or the group called 
+## @var{groupname}.
 ##
-## vinfo.Size: the size of the netcdf variable. For vectors the Size field
-##   has only one element.
+## The structure @var{info} has always the following fields:
+## @itemize
+## @item @var{Filename}: the name of the NetCDF file
+## @item @var{Format}: one of the strings "CLASSIC", "64BIT", "NETCDF4"
+## or "NETCDF4_CLASSIC"
+## @end itemize
+##
+## The structure @var{info} has additional fields depending on wether a 
+## group of variable is queried.
+##
+## Groups
+##
+## Groups are returned as an array structure with the following fields:
+##
+## @itemize
+## @item @var{Name}: the group name. The root group is named "/".
+## @item @var{Dimensions}: a array structure with the dimensions.
+## @item @var{Variables}: a array structure with the variables.
+## @item @var{Attributes}: a array structure with global attributes.  
+## @item @var{Groups}: a array structure (one for each group) with the 
+## same fields as this structure.
+## @end itemize
+##
+## Dimensions
+##
+## Dimensions are returned as an array structure with the following fields:
+## @itemize
+##   @item @var{Name}: the name of the dimension
+##   @item @var{Length}: the length of the dimension
+##   @item @var{Unlimited}: true of the dimension has no fixed limited, false 
+## @end itemize
+##
+## Variables
+##
+## Variables are returned as an array structure with the following fields:
+## @itemize
+##   @item @var{Name}: the name of the dimension
+##   @item @var{Dimensions}: array structure of all dimensions of this variable 
+## with the same structure as above.
+##   @item @var{Size}: array with the size of the variable
+##   @item @var{Datatype}: string with the corresponding octave data-type 
+## (see below)
+##   @item @var{Attributes}: a array structure of attributes
+##   @item @var{FillValue}: the NetCDF fill value of the variable. If the fill 
+## value is not defined, then this attribute is an empty array ([]).
+##   @item @var{DeflateLevel}: the NetCDF deflate level between 0 (no 
+##   compression) and 9 (maximum compression).
+##   @item @var{Shuffle}: is true if the shuffle filter is activated to improve 
+##   compression, otherwise false.
+##   @item @var{CheckSum}: is set to "fletcher32", if check-sums are used, 
+#    otherwise this field is not defined.
+## @end itemize
+##
+## Attributes
+##
+## Attributes are returned as an array structure with the following fields: 
+## @itemize
+##   @item @var{Name}: the name of the attribute
+##   @item @var{Value}: the value of the attribute (with the corresponding type)
+##   @item @var{Unlimited}: true of the dimension has no fixed limited, false 
+## @end itemize
+##
+## Data-types
+##
+## The following the the correspondence between the Octave and NetCDF 
+## data-types:
+## 
+## @multitable @columnfractions .5 .5
+## @headitem Octave type @tab NetCDF type
+## @item @code{int8}    @tab @code{NC_BYTE}   
+## @item @code{uint8}   @tab @code{NC_UBYTE}  
+## @item @code{int16}   @tab @code{NC_SHORT}  
+## @item @code{uint16}  @tab @code{NC_USHORT} 
+## @item @code{int32}   @tab @code{NC_INT}    
+## @item @code{uint32}  @tab @code{NC_UINT}   
+## @item @code{int64}   @tab @code{NC_INT64}  
+## @item @code{uint64}  @tab @code{NC_UINT64} 
+## @item @code{single}  @tab @code{NC_FLOAT}  
+## @item @code{double}  @tab @code{NC_DOUBLE} 
+## @item @code{char}    @tab @code{NC_CHAR}   
+## @end multitable
+##
+## The output of @code{ncinfo} can be used to create a NetCDF file with the same
+## meta-data using @code{ncwriteschema}.
 ##
 ## Note: If there are no attributes (or variable or groups), the corresponding 
 ## field is an empty matrix and not an empty struct array for compability
 ## with matlab.
 ##
-## @seealso{ncread,nccreate}
+## @seealso{ncread,nccreate,ncwriteschema}
 ##
 ## @end deftypefn
 
-function info = ncinfo(filename,varname)
+function info = ncinfo(filename,name)
 
-ncid = netcdf_open(filename,'NC_NOWRITE');
+ncid = netcdf_open(filename,"NC_NOWRITE");
+info.Filename = filename;    
 
 if nargin == 1    
-    info.Filename = filename;    
-    info = ncinfo_group(ncid,info);
-    
-    % format
-    format = netcdf_inqFormat(ncid);
-    info.Format = lower(strrep(format,'FORMAT_',''));    
-elseif nargin == 2
-    unlimdimIDs = netcdf_inqUnlimDims(ncid);
-    varid = netcdf_inqVarID(ncid, varname);
-    info = ncinfo_var(ncid,varid,unlimdimIDs);
-end
+  name = "/";
+endif
+
+try
+  # try if name is a group
+  gid = netcdf_inqGrpFullNcid(ncid,name);
+  varid = [];
+catch
+  # assume that name is a variable
+  [gid,varid] = ncvarid(ncid,name);
+end_try_catch
+
+if isempty(varid)
+  info = ncinfo_group(info,gid);
+else
+  unlimdimIDs = netcdf_inqUnlimDims(gid);
+  info = ncinfo_var(info,gid,varid,unlimdimIDs);
+endif
+
+# NetCDF format
+ncformat = netcdf_inqFormat(ncid);
+info.Format = lower(strrep(ncformat,'FORMAT_',''));    
 
 netcdf_close(ncid);
-end
+endfunction
 
 function dims = ncinfo_dim(ncid,dimids,unlimdimIDs)
 
@@ -63,12 +159,12 @@ for i=1:length(dimids)
     dims = [tmp];
   else
     dims(i) = tmp;
-  end
-end
-end
+  endif
+endfor
+endfunction
 
 
-function vinfo = ncinfo_var(ncid,varid,unlimdimIDs)
+function vinfo = ncinfo_var(vinfo,ncid,varid,unlimdimIDs)
 
 [vinfo.Name,xtype,dimids,natts] = netcdf_inqVar(ncid,varid);
 
@@ -83,32 +179,7 @@ end
 
 % Data type
 
-if xtype == netcdf_getConstant('NC_CHAR')
-  vinfo.Datatype = 'char';
-elseif xtype == netcdf_getConstant('NC_FLOAT')
-  vinfo.Datatype = 'single';
-elseif xtype == netcdf_getConstant('NC_DOUBLE')
-  vinfo.Datatype = 'double';
-elseif xtype == netcdf_getConstant('NC_BYTE')
-  vinfo.Datatype = 'int8';
-elseif xtype == netcdf_getConstant('NC_SHORT')
-  vinfo.Datatype = 'int16';
-elseif xtype == netcdf_getConstant('NC_INT')
-  vinfo.Datatype = 'int32';
-elseif xtype == netcdf_getConstant('NC_INT64')
-  vinfo.Datatype = 'int64';
-elseif xtype == netcdf_getConstant('NC_UBYTE')
-  vinfo.Datatype = 'uint8';
-elseif xtype == netcdf_getConstant('NC_USHORT')
-  vinfo.Datatype = 'uint16';
-elseif xtype == netcdf_getConstant('NC_UINT')
-  vinfo.Datatype = 'uint32';
-elseif xtype == netcdf_getConstant('NC_UINT64')
-  vinfo.Datatype = 'uint64';
-else
-  error('netcdf:unknownDataType','unknown data type %d',xtype)
-end
-
+vinfo.Datatype = nc2octtype(xtype);
 
 % Attributes
 
@@ -123,8 +194,8 @@ for i = 0:natts-1
       vinfo.Attributes = [tmp];
     else
       vinfo.Attributes(i+1) = tmp;
-    end    
-end
+    endif
+endfor
 
 % chunking, fillvalue, compression
 
@@ -133,29 +204,26 @@ end
 [nofill,vinfo.FillValue] = netcdf_inqVarFill(ncid,varid);
 if nofill
   vinfo.FillValue = [];
-end
+endif
 
 [shuffle,deflate,vinfo.DeflateLevel] = ...
     netcdf_inqVarDeflate(ncid,varid);
 
 if ~deflate
   vinfo.DeflateLevel = [];
-end
+endif
 vinfo.Shuffle = shuffle;
 
 # add checksum information if defined (unlike matlab)
 checksum = netcdf_inqVarFletcher32(ncid,varid);
 if ~strcmp(checksum,'nochecksum');
   vinfo.Checksum = checksum;
-end
+endif
 
-end
+endfunction
 
 
-function info = ncinfo_group(ncid,info)
-if nargin == 1
-  info = struct();
-end
+function info = ncinfo_group(info,ncid)
 
 info.Name = netcdf_inqGrpName(ncid);
 unlimdimIDs = netcdf_inqUnlimDims(ncid);
@@ -169,8 +237,8 @@ info.Dimensions = ncinfo_dim(ncid,dimids,unlimdimIDs);
 
 % variables
 for i=1:nvars
-  info.Variables(i) = ncinfo_var(ncid,i-1,unlimdimIDs);
-end
+  info.Variables(i) = ncinfo_var(struct(),ncid,i-1,unlimdimIDs);
+endfor
 
 % global attributes
 info.Attributes = [];
@@ -184,35 +252,19 @@ for i = 0:ngatts-1
     info.Attributes = [tmp];
   else
     info.Attributes(i+1) = tmp;
-  end
-end
+  endif
+endfor
 
 info.Groups = [];
 gids = netcdf_inqGrps(ncid);
 for i = 1:length(gids)
-  tmp = ncinfo_group(gids(i));
+  tmp = ncinfo_group(struct(),gids(i));
   
   if isempty(info.Groups)      
     info.Groups = [tmp];
   else
     info.Groups(i) = tmp;
-  end
-end
+  endif
+endfor
 
-end
-
-
-%% Copyright (C) 2013 Alexander Barth
-%%
-%% This program is free software; you can redistribute it and/or modify
-%% it under the terms of the GNU General Public License as published by
-%% the Free Software Foundation; either version 3 of the License, or
-%% (at your option) any later version.
-%%
-%% This program is distributed in the hope that it will be useful,
-%% but WITHOUT ANY WARRANTY; without even the implied warranty of
-%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-%% GNU General Public License for more details.
-%%
-%% You should have received a copy of the GNU General Public License
-%% along with this program; If not, see <http://www.gnu.org/licenses/>.
+endfunction

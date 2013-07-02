@@ -1774,6 +1774,29 @@ DEFUN_DLD(netcdf_inqGrpFullNcid, args,,
   std::string name = args(1).string_value();
   int grp_ncid;
 
+  int format;
+  check_err(nc_inq_format(ncid, &format));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
+  if (format == NC_FORMAT_CLASSIC || format == NC_FORMAT_64BIT) 
+    {
+      if (name == "/") 
+        {
+          return octave_value(ncid);
+        }
+      else 
+        {
+          error("groups are not supported in this format");
+          return octave_value();
+        }
+    }
+
+  // nc_inq_grp_full_ncid makes a segmentation fault if
+  // file is in non-HDF5 format
   check_err(nc_inq_grp_full_ncid(ncid, name.c_str(),&grp_ncid));
   return octave_value(grp_ncid);
 }
