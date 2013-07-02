@@ -12,11 +12,14 @@ constants:
 clean:
 	rm netcdf_package.oct 
 
+real-clean: clean
+	rm ../PKG_ADD ../inst/import_netcdf.m 
+
 netcdf_package.oct: netcdf_package.cc netcdf_constants.h
 	$(MKOCTFILE) netcdf_package.cc $(LIBS)
 
-PKG_ADD: netcdf_package.cc
+../PKG_ADD: netcdf_package.cc
 	sh PKG_ADD.sh
 
-check: PKG_ADD netcdf_package.oct
+check: ../PKG_ADD netcdf_package.oct	
 	($(OCTAVE) -f --eval "pkg unload octcdf; addpath $$PWD; addpath $$PWD/../inst; test_netcdf")
