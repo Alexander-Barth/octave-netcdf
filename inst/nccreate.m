@@ -1,8 +1,59 @@
+## Copyright (C) 2013 Alexander Barth
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; If not, see <http://www.gnu.org/licenses/>.
+
+## -*- texinfo -*-
+## @deftypefn  {Function File} nccreate(@var{filename},@var{varname})
+## @deftypefnx  {Function File} nccreate(@var{filename},@var{varname},"property",@var{value},...)
+##
+## Create the variable @var{varname} in the file @var{filename}.
+##
+## The following properties can be used:
+## @itemize
+## @item "dimensions": a cell array with the dimension names followed by their
+## length or Inf if the dimension is unlimited. If the property is ommited, a 
+## scalar variable is created.
+## @item "datatype": a string with the Octave data type name 
+## (see @code{ncinfo} for the correspondence between Octave and NetCDF data 
+## types). The default data type is a "double".
+## @item "format": This can be "netcdf4_classic" (default), "classic", "64bit" 
+## or "netcdf4".
+## @item "FillValue": the value used for undefined elements of the NetCDF 
+## variable.
+## @item "ChunkSize": the size of the data chunks. If omited, the variable is 
+## not chunked.
+## @item "DeflateLevel": The deflate level for compression. It can be the string
+## "disable" (default) for no compression or an integer between 0 (no 
+## compression) and 9 (maximum compression).
+## @item "Shuffle": true for enabling the shuffle filter or false (default) for 
+## disabling it.
+## @end itemize
+##
+## Example:
+## @example
+## nccreate("test.nc","temp","Dimensions",@{"lon",10,"lat",20@},"Format","classic");
+## ncdisp("test.nc");
+## @end example
+## @seealso{ncwrite}
+## @end deftypefn
+
+
 function nccreate(filename,varname,varargin)
 
 dimensions = {};
 datatype = 'double';
-format = 'netcdf4_classic';
+ncformat = 'netcdf4_classic';
 FillValue = [];
 ChunkSize = [];
 DeflateLevel = 'disable';
@@ -17,7 +68,7 @@ for i = 1:2:length(varargin)
   elseif strcmp(varargin{i},'Datatype')
     datatype = varargin{i+1};
   elseif strcmp(varargin{i},'Format')
-    format = varargin{i+1};
+    ncformat = varargin{i+1};
   elseif strcmp(varargin{i},'FillValue')
     FillValue = varargin{i+1};
   elseif strcmp(varargin{i},'ChunkSize')
@@ -33,7 +84,7 @@ if ~isempty(stat(filename))
   ncid = netcdf_open(filename,'NC_WRITE');
   netcdf_reDef(ncid);
 else    
-  mode = format2mode(format);
+  mode = format2mode(ncformat);
   ncid = netcdf_create(filename,mode);
 end
 

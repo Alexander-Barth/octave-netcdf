@@ -1,3 +1,46 @@
+## Copyright (C) 2013 Alexander Barth
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; If not, see <http://www.gnu.org/licenses/>.
+
+## -*- texinfo -*-
+## @deftypefn  {Function File} ncwriteschema (@var{filename}, @var{shema})
+##
+## Create a NetCDF called @var{filename} with the dimensions, attributes, 
+## variables and groups given by the structure @var{schema}.
+##
+## The variable @var{schema} has the same structure as the results of 
+## @code{ncinfo}. @code{ncinfo} and @code{ncwriteschema} can be used together to
+## create a NetCDF using another file as a template:
+##
+## @example
+## schema = ncinfo("template.nc");
+## # the new file should be named "new_file.nc"
+## ncwriteschema("new_file.nc",schema);
+## @end example
+##
+## Unused field in @var{schema} such as @var{ChunkSize}, @var{Shuffle}, 
+## @var{DeflateLevel}, @var{FillValue}, @var{Checksum} can be left-out if the 
+## corresponding feature is not used.
+##
+## Dimensions are considered as limited if the field @var{Unlimited} is missing,
+## unless the dimension length is Inf.
+##
+## @seealso{ncinfo}
+##
+## @end deftypefn
+
+
 function ncwriteschema(filename,s)
 
 

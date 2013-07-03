@@ -25,6 +25,8 @@ s.Groups(1).Variables(1).Dimensions = s.Dimensions;
 s.Groups(1).Variables(1).Datatype = 'double';
 s.Groups(1).Variables(1).Attributes(1).Name = 'long_name';
 s.Groups(1).Variables(1).Attributes(1).Value = 'temperature';
+s.Groups(1).Attributes(1).Name = 'institution';
+s.Groups(1).Attributes(1).Value =  'ULg';
 
 s.Groups(2) = s.Groups(1);
 s.Groups(2).Name = 'analysis';
@@ -45,5 +47,13 @@ assert(isequal(z,z2))
 
 ginfo = ncinfo(fname,'forecast');
 assert(strcmp(ginfo.Name,'forecast'));
+
+% read global attribute of root group
+val = ncreadatt(fname,'/','institution');
+assert(strcmp(val,'GHER, ULg'));
+
+% read global attribute of group forecast
+val = ncreadatt(fname,'/forecast','institution');
+assert(strcmp(val,'ULg'));
 
 delete(fname);

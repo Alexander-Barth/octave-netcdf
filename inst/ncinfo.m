@@ -110,7 +110,7 @@
 ## field is an empty matrix and not an empty struct array for compability
 ## with matlab.
 ##
-## @seealso{ncread,nccreate,ncwriteschema}
+## @seealso{ncread,nccreate,ncwriteschema,ncdisp}
 ##
 ## @end deftypefn
 
@@ -123,14 +123,7 @@ if nargin == 1
   name = "/";
 endif
 
-try
-  # try if name is a group
-  gid = netcdf_inqGrpFullNcid(ncid,name);
-  varid = [];
-catch
-  # assume that name is a variable
-  [gid,varid] = ncvarid(ncid,name);
-end_try_catch
+[gid,varid] = ncloc(ncid,name);
 
 if isempty(varid)
   info = ncinfo_group(info,gid);
