@@ -154,8 +154,8 @@ dnl *******************************************************************
 
 dnl Get LDFLAGS and CPPFLAGS set by user
 dnl These flags will be added to the mkoctfile command line
-OCTCDF_LIBS="$LDFLAGS"
-OCTCDF_CFLAGS="$CPPFLAGS"
+NETCDF_LIBS="$LDFLAGS"
+NETCDF_CFLAGS="$CPPFLAGS"
 
 
 dnl XXX FIXME XXX Should we allow the user to override these?
@@ -164,7 +164,7 @@ dnl themselves, so the only reason to keep them is for configure, and
 dnl for those things which are not built using mkoctfile (e.g., aurecord)
 dnl but it is not clear we should be using octave compile flags for those.
 
-dnl octcdf does not need CFLAGS, CPPFLAGS,... from mkoctfile
+dnl netcdf does not need CFLAGS, CPPFLAGS,... from mkoctfile
 dnl -> comment corresponding lines
 
 # dnl C compiler and flags
@@ -308,53 +308,16 @@ case "$canonical_host_type" in
     ;;
 esac
 
-dnl first checking for nc-config, then nc-dap 
+dnl checking for nc-config
 
-AC_MSG_CHECKING([for nc-config])
-
-if nc-config --version > /dev/null 2>&1; then
-      AC_MSG_RESULT([yes])
-      OCTCDF_LIBS="$OCTCDF_LIBS `nc-config --libs`"
-      OCTCDF_CFLAGS="$OCTCDF_CFLAGS `nc-config --cflags`"
-      HAVE_NETCDF=yes
-else
-      AC_MSG_RESULT([no])          
-      AC_MSG_CHECKING([for nc-dap])
-
-      if ncdap-config --version > /dev/null 2>&1; then
-            AC_MSG_RESULT([yes])
-            OCTCDF_LIBS="$OCTCDF_LIBS `ncdap-config --libs`"
-            OCTCDF_CFLAGS="$OCTCDF_CFLAGS `ncdap-config --cflags`"
-
-            HAVE_NETCDF=yes
-      else
-            AC_MSG_RESULT([no])          
-
-            dnl if no opendap, checking if the NetCDF library exists. 
-	    dnl AC_CHECK_LIB takes the value of LDFLAGS into account
-
-            AC_CHECK_LIB(netcdf,nc_open, HAVE_NETCDF=yes, HAVE_NETCDF=no,)
-
-            if test $HAVE_NETCDF = yes ; then
-              OCTCDF_LIBS="$OCTCDF_LIBS -lnetcdf"
-
-              dnl we have the libraries, no we have also the headers?
-	      dnl AC_CHECK_HEADER takes the value of CPPFLAGS into account
-
-              AC_CHECK_HEADER(netcdf.h, HAVE_NETCDF=yes, HAVE_NETCDF=no)
-            fi
-      fi
+AC_CHECK_PROG(NC_CONFIG, nc-config, nc-config)
+if test -z "$NC_CONFIG"; then
+AC_MSG_ERROR([nc-config not found], 1);
 fi
 
-AC_SUBST(HAVE_NETCDF)
-AC_SUBST(OCTCDF_LIBS)
-AC_SUBST(OCTCDF_CFLAGS)
+NETCDF_LIBS="$NETCDF_LIBS `nc-config --libs`"
+NETCDF_CFLAGS="$NETCDF_CFLAGS `nc-config --cflags`"
 
-if test $HAVE_NETCDF = yes ; then
-    OCTCDFSTATUS=yes
-else
-    OCTCDFSTATUS=no
-fi
 
 CONFIGURE_OUTPUTS="Makeconf"
 STATUS_MSG="
@@ -375,6 +338,5 @@ shell commands will install into the following directories:
 octave-forge is configured with
    octave:      $OCTAVE (version $OCTAVE_VERSION)
    mkoctfile:	$MKOCTFILE for Octave $subver
-   octcdf toolbox: $OCTCDFSTATUS
-   netCDF compiler flags: $OCTCDF_CFLAGS
-   netCDF libraries: $OCTCDF_LIBS"
+   netCDF compiler flags: $NETCDF_CFLAGS
+   netCDF libraries: $NETCDF_LIBS"
