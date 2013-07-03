@@ -1,5 +1,5 @@
-netcdf >> NetCDF 
-NetCDF
+netcdf >> NetCDF interface
+High-level functions
  nccreate     
  ncdisp       
  ncinfo       
@@ -8,3 +8,56 @@ NetCDF
  ncwriteatt   
  ncwrite      
  ncwriteschema
+Low-level functions
+ netcdf_getConstant
+ netcdf_getConstantNames
+ netcdf_inqLibVers
+ netcdf_setDefaultFormat
+ netcdf_setChunkCache
+ netcdf_getChunkCache
+ netcdf_create
+ netcdf_open
+ netcdf_abort
+ netcdf_sync
+ netcdf_setFill
+ netcdf_inq
+ netcdf_inqUnlimDims
+ netcdf_inqFormat
+ netcdf_defDim
+ netcdf_renameDim
+ netcdf_defVar
+ netcdf_renameVar
+ netcdf_defVarFill
+ netcdf_inqVarFill
+ netcdf_defVarDeflate
+ netcdf_inqVarDeflate
+ netcdf_defVarChunking
+ netcdf_inqVarChunking
+ netcdf_defVarFletcher32
+ netcdf_inqVarFletcher32
+ netcdf_endDef
+ netcdf_reDef
+ netcdf_putVar
+ netcdf_getVar
+ netcdf_close
+ netcdf_inqAttName
+ netcdf_inqAttID
+ netcdf_inqAtt
+ netcdf_getAtt
+ netcdf_putAtt
+ netcdf_copyAtt
+ netcdf_renameAtt
+ netcdf_delAtt
+ netcdf_inqVarID
+ netcdf_inqVarIDs
+ netcdf_inqVar
+ netcdf_inqDim
+ netcdf_inqDimID
+ netcdf_inqDimIDs
+ netcdf_defGrp
+ netcdf_inqGrps
+ netcdf_inqGrpName
+ netcdf_inqGrpNameFull
+ netcdf_inqGrpParent
+ netcdf_inqGrpFullNcid
+ netcdf_inqNcid

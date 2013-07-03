@@ -14,7 +14,7 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} @var{val} = ncreadatt(@var{filename},@var{varname},@var{attname})
+## @deftypefn  {Function File} {@var{val} =} ncreadatt(@var{filename},@var{varname},@var{attname})
 ##
 ## Return the attribute @var{attname} of the variable @var{varname} in the file
 ## @var{filename}.

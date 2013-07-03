@@ -14,9 +14,9 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} @var{info} = ncinfo (@var{filename})
-## @deftypefnx  {Function File} @var{info} = ncinfo (@var{filename}, @var{varname})
-## @deftypefnx  {Function File} @var{info} = ncinfo (@var{filename}, @var{groupname})
+## @deftypefn  {Function File} {@var{info} =} ncinfo (@var{filename})
+## @deftypefnx  {Function File} {@var{info} =} ncinfo (@var{filename}, @var{varname})
+## @deftypefnx  {Function File} {@var{info} =} ncinfo (@var{filename}, @var{groupname})
 ## return information about an entire NetCDF file @var{filename} (i.e. the root 
 ## group "/"), about the variable called @var{varname} or the group called 
 ## @var{groupname}.
