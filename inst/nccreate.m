@@ -14,8 +14,8 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} nccreate(@var{filename},@var{varname})
-## @deftypefnx  {Function File} nccreate(@var{filename},@var{varname},"property",@var{value},...)
+## @deftypefn  {Function File} {} nccreate(@var{filename},@var{varname})
+## @deftypefnx  {Function File} {} nccreate(@var{filename},@var{varname},"property",@var{value},...)
 ##
 ## Create the variable @var{varname} in the file @var{filename}.
 ##

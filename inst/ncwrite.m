@@ -14,8 +14,8 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} ncwrite (@var{filename}, @var{varname}, @var{x})
-## @deftypefnx  {Function File} ncwrite (@var{filename}, @var{varname}, @var{x}, @var{start}, @var{stride})
+## @deftypefn  {Function File} {} ncwrite (@var{filename}, @var{varname}, @var{x})
+## @deftypefnx  {Function File} {} ncwrite (@var{filename}, @var{varname}, @var{x}, @var{start}, @var{stride})
 ##
 ## Write array @var{x} to the the variable @var{varname} in the NetCDF file 
 ## @var{filename}.

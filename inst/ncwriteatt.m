@@ -14,7 +14,7 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} ncwriteatt(@var{filename},@var{varname},@var{attname},@var{val})
+## @deftypefn  {Function File} {} ncwriteatt(@var{filename},@var{varname},@var{attname},@var{val})
 ##
 ## Defines the attribute @var{attname} of the variable @var{varname} in the file
 ## @var{filename} with the value @var{val}.

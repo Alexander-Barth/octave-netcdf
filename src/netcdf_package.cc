@@ -244,7 +244,7 @@ Sets the default format of the NetCDF library and returns the previous default f
 
 DEFUN_DLD(netcdf_setChunkCache, args,, 
   "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
+@deftypefn {Loadable Function} {} netcdf_setChunkCache(@var{size}, @var{nelems}, @var{preemption}) \n\
 Sets the default chunk cache settins in the HDF5 library. The settings applies to all files which are subsequently opened or created.\n\
 @end deftypefn\n\
 @seealso{netcdf_getChunkCache}\n")
@@ -956,7 +956,7 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
 // nc_def_var_fletcher32(int ncid, int varid, int checksum);
 DEFUN_DLD(netcdf_defVarFletcher32, args,, 
 "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} netcdf_defVarFletcher32(@var{ncid},@var{varid},@var{checksum}) \n\
+@deftypefn {Loadable Function} {} netcdf_defVarFletcher32(@var{ncid},@var{varid},@var{checksum}) \n\
 Defines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If @var{checksum} is the string \"fletcher32\", then fletcher32 checksums will be turned on for this variable. If @var{checksum} is \"nochecksum\", then checksums will be disabled. \n\
 @end deftypefn\n\
 @seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
@@ -987,7 +987,7 @@ Defines the checksum settings of the variable with the id @var{varid} in the dat
 
 DEFUN_DLD(netcdf_inqVarFletcher32, args,, 
 "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} @var{checksum} = netcdf_inqVarFletcher32(@var{ncid},@var{varid}) \n\
+@deftypefn {Loadable Function} {@var{checksum} =} netcdf_inqVarFletcher32(@var{ncid},@var{varid}) \n\
 Determines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If fletcher32 checksums is turned on for this variable, then @var{checksum} is the string \"fletcher32\". Otherwise it is the string \"nochecksum\". \n\
 @end deftypefn\n\
 @seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
@@ -1240,7 +1240,7 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
 
 DEFUN_DLD(netcdf_close, args,, 
   "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} netcdf_close(@var{ncid}) \n\
+@deftypefn {Loadable Function} {} netcdf_close(@var{ncid}) \n\
 Close the NetCDF file with the id @var{ncid}.\n\
 @end deftypefn\n\
 @seealso{netcdf_open}\n")

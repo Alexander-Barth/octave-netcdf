@@ -14,7 +14,7 @@
 ## along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {Function File} ncwriteschema (@var{filename}, @var{shema})
+## @deftypefn  {Function File} {} ncwriteschema (@var{filename}, @var{shema})
 ##
 ## Create a NetCDF called @var{filename} with the dimensions, attributes, 
 ## variables and groups given by the structure @var{schema}.
