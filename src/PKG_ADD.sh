@@ -15,7 +15,7 @@
 # along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 
-netcdf_functions=$(awk -F'[(,]' '/DEFUN_DLD/ { print $2 } ' netcdf_package.cc)
+netcdf_functions=$(awk -F'[(,]' '/DEFUN_DLD/ { print $2 } ' netcdf_package.cc | grep -v netcdf_package)
 
 outfile=../PKG_ADD
 importfile=../inst/import_netcdf.m
