@@ -160,19 +160,6 @@ void start_count_stride(int ncid, int varid, octave_value_list args,int len,size
 }
 
 
-// avoid warnings like
-// warning: gen_doc_cache: unusable help text found in file 'netcdf_package'
-
-DEFUN_DLD(netcdf_package, args,, 
-  "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} {} netcdf_package() \n\
-This NetCDF packages implements a high and low-level interface for manipulation netcdf files.\n\
-@end deftypefn\n\
-@seealso{nccreate,ncread,ncwrite,netcdf_open}\n")
-{
-      return octave_value();
-}
-
 DEFUN_DLD(netcdf_getConstant, args,, 
   "-*- texinfo -*-\n\
 @deftypefn {Loadable Function} {@var{value} =} netcdf_getConstant(@var{name}) \n\
