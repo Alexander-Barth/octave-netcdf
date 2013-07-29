@@ -42,18 +42,6 @@ for i=1:length(types)
   vid{i} = netcdf.defVar(ncid,[types{i} '_variable'],types{i},[dimid_lon,dimid]);
 end
 
-netcdf.putAtt(ncid,varidd,'toto',int8(123));
-netcdf.putAtt(ncid,varidd,'toto32',int32(123));
-%netcdf.putAtt(ncid,varidd,'toto64',int64(123)); % does not work in octave and matlab
-netcdf.putAtt(ncid,varidd,'add_offset',single(123123.123));
-netcdf.putAtt(ncid,varidd,'_FillValue',double(123123.123));
-netcdf.putAtt(ncid,varidd,'name','this is a name');
-
-[xtype,len] = netcdf.inqAtt(ncid,varidd,'name');
-assert(xtype == netcdf.getConstant('NC_CHAR'))
-assert(len == length('this is a name'))
-
-assert(isequal(netcdf.getAtt(ncid,varidd,'add_offset'),single(123123.123)));
 
 netcdf.endDef(ncid)
 

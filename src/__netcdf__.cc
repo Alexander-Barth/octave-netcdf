@@ -189,6 +189,11 @@ Returns a list of all constant names.\n\
       return octave_value();
     }
 
+  if (netcdf_constants.empty())
+    {
+      init();
+    }
+
   Cell c = Cell (dim_vector(1,netcdf_constants.size()));
 
   int i = 0;
