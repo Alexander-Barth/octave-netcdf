@@ -12,8 +12,6 @@ cat <<EOF >> configure.in
   echo "  \"\\\$prefix\" is \$prefix"
   echo "  \"\\\$exec_prefix\" is \$exec_prefix"
   AC_MSG_RESULT([\$STATUS_MSG
-
-find . -name NOINSTALL -print    # shows which toolboxes won't be installed
 ])
 EOF
 

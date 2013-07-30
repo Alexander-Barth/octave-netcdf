@@ -1,5 +1,6 @@
 netcdf >> NetCDF interface
 High-level functions
+ test_netcdf
  nccreate     
  ncdisp       
  ncinfo       
