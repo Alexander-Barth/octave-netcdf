@@ -1,6 +1,5 @@
 netcdf >> NetCDF interface
 High-level functions
- test_netcdf
  nccreate     
  ncdisp       
  ncinfo       
@@ -62,3 +61,5 @@ Low-level functions
  netcdf_inqGrpParent
  netcdf_inqGrpFullNcid
  netcdf_inqNcid
+Test function
+ test_netcdf

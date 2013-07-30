@@ -185,7 +185,8 @@ Returns a list of all constant names.\n\
 @seealso{netcdf_getConstant}\n")
 {
 
-  if (args.length() != 0) {
+  if (args.length() != 0) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -215,7 +216,8 @@ Returns the version of the NetCDF library.\n\
 @end deftypefn\n\
 @seealso{netcdf_open}\n")
 {
-  if (args.length() != 0) {
+  if (args.length() != 0) 
+    {
       print_usage ();
       return octave_value ();
     }
@@ -239,6 +241,12 @@ Sets the default format of the NetCDF library and returns the previous default f
 
   int format = netcdf_get_constant(args(0)).int_value();
   int old_format;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_set_default_format(format, &old_format));
 
@@ -344,6 +352,12 @@ ncid = netcdf.create(\"test.nc\",mode); \n\
   int mode = netcdf_get_constant(args(1)).int_value();
   int ncid;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_create(filename.c_str(), mode, &ncid));
 
   return octave_value(ncid);
@@ -357,7 +371,8 @@ Opens the file named @var{filename} in the mode @var{mode}.\n\
 @seealso{netcdf_close}\n")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -365,6 +380,12 @@ Opens the file named @var{filename} in the mode @var{mode}.\n\
   std::string filename = args(0).string_value();
   int mode = netcdf_get_constant(args(1)).int_value();
   int ncid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_open(filename.c_str(), mode, &ncid));
 
@@ -469,7 +490,8 @@ the function netcdf_inqUnlimDims as multiple unlimite dimension exists. \n\
 @end deftypefn\n\
 @seealso{netcdf_inqUnlimDims}\n")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -477,6 +499,12 @@ the function netcdf_inqUnlimDims as multiple unlimite dimension exists. \n\
   int ncid = args(0).scalar_value();
   int ndims, nvars, ngatts, unlimdimid;
   octave_value_list retval;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq(ncid,&ndims,&nvars,&ngatts,&unlimdimid));
     
@@ -495,13 +523,20 @@ Return the id of all unlimited dimensions of the NetCDF file @var{ncid}.\n\
 @end deftypefn\n\
 @seealso{netcdf_inq}\n")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
   int nunlimdims;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq_unlimdims(ncid, &nunlimdims, NULL));
   Array<int> unlimdimids = Array<int>(dim_vector(1,nunlimdims));
@@ -522,13 +557,21 @@ Format might be one of the following \n\
 @seealso{netcdf_inq}\n")
 {
 
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
   int format;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_format(ncid, &format));
 
   if (format == NC_FORMAT_CLASSIC) {
@@ -554,7 +597,8 @@ Define the dimension with the name @var{name} and the length @var{len} in the da
 @seealso{netcdf_defVar}\n")
 {
 
-  if (args.length() != 3) {
+  if (args.length() != 3) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -563,6 +607,12 @@ Define the dimension with the name @var{name} and the length @var{len} in the da
   std::string name = args(1).string_value();
   size_t len = args(2).scalar_value();
   int dimid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_def_dim (ncid, name.c_str(), len, &dimid));
 
@@ -613,7 +663,8 @@ Defines a variable with the name @var{name} in the dataset @var{ncid}. @var{xtyp
 @seealso{netcdf_open,netcdf_defDim}\n")
 {
 
-  if (args.length() != 4) {
+  if (args.length() != 4) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -621,6 +672,13 @@ Defines a variable with the name @var{name} in the dataset @var{ncid}. @var{xtyp
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value (); 
   int xtype = netcdf_get_constant(args(2)).int_value();;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   Array<double> tmp;
 
   if (!args(3).is_empty()) {
@@ -685,7 +743,8 @@ If @var{no_fill} is false, then the values between no-contiguous writes are fill
 @seealso{netcdf_inqVarFill}\n")
 {
 
-  if (args.length() != 4) {
+  if (args.length() != 4) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -695,6 +754,13 @@ If @var{no_fill} is false, then the values between no-contiguous writes are fill
   int no_fill = args(2).scalar_value(); // boolean
   octave_value fill_value = args(3); 
   nc_type xtype;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_vartype (ncid, varid, &xtype));
 
   switch (xtype)
@@ -736,7 +802,8 @@ If @var{no_fill} is false, then the values between no-contiguous writes are fill
 @seealso{netcdf_defVarFill}\n")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -747,7 +814,19 @@ If @var{no_fill} is false, then the values between no-contiguous writes are fill
   nc_type xtype;
   octave_value_list retval;
   octave_value data;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_vartype (ncid, varid, &xtype));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
 
   switch (xtype)
     {
@@ -796,7 +875,8 @@ If @var{deflate} is true, then the variable is compressed. The compression level
 @seealso{netcdf_inqVarDeflate}\n")
 {
 
-  if (args.length() != 5) {
+  if (args.length() != 5) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -806,6 +886,12 @@ If @var{deflate} is true, then the variable is compressed. The compression level
   int shuffle = args(2).scalar_value(); // boolean
   int deflate = args(3).scalar_value(); // boolean
   int deflate_level = args(4).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_def_var_deflate (ncid, varid, shuffle, deflate, deflate_level));
   return octave_value();
@@ -823,7 +909,8 @@ If @var{deflate} is true, then the variable is compressed. The compression level
 @seealso{netcdf_defVarDeflate}\n")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -868,7 +955,8 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
 @seealso{netcdf_inqVarChunking}\n")
 {
 
-  if (args.length() != 3 && args.length() != 4) {
+  if (args.length() != 3 && args.length() != 4) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -922,7 +1010,8 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
 @seealso{netcdf_defVarChunking}\n")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1043,6 +1132,13 @@ Leaves define-mode of NetCDF file @var{ncid}.\n\
     }
 
   int ncid = args(0).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_enddef (ncid));
   
   return octave_value();
@@ -1062,6 +1158,13 @@ Enter define-mode of NetCDF file @var{ncid}.\n\
     }
 
   int ncid = args(0).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_redef (ncid));
   
   return octave_value();
@@ -1097,8 +1200,19 @@ The data @var{data} is stored in the variable @var{varid} of the NetCDF file @va
   ptrdiff_t stride[NC_MAX_VAR_DIMS];
   nc_type xtype;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_vartype (ncid, varid, &xtype));
   //int sliced_numel = tmp.numel();
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
 
   start_count_stride(ncid, varid, args, args.length()-1, start, count, stride);
 
@@ -1167,8 +1281,26 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
   octave_value data;
   nc_type xtype;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_vartype (ncid, varid, &xtype));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   check_err(nc_inq_varndims (ncid, varid, &ndims));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   int sz = 1;
 
   dim_vector sliced_dim_vector;
@@ -1252,12 +1384,20 @@ Close the NetCDF file with the id @var{ncid}.\n\
 @seealso{netcdf_open}\n")
 {
 
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_close(ncid));
   return octave_value ();
 }
@@ -1285,6 +1425,12 @@ netcdf_getConstant(\"global\").\n\
   int varid = args(1).scalar_value();
   int attnum = args(2).scalar_value();
   char name[NC_MAX_NAME+1];
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq_attname(ncid, varid, attnum, name));
 
@@ -1333,10 +1479,11 @@ Get attribute type and length.\n\
 @seealso{netcdf_inqAttName}\n\
 @end deftypefn")
 {
-  if (args.length() != 3) {
-    print_usage ();
-    return octave_value();
-  }
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
 
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value();
@@ -1344,10 +1491,12 @@ Get attribute type and length.\n\
   int xtype;
   size_t len;
   octave_value_list retval;
-  
-  if (error_state) {
-    return octave_value();    
-  }
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq_att(ncid, varid, name.c_str(), &xtype, &len));
   
@@ -1367,10 +1516,11 @@ netcdf_getConstant(\"global\").\n\
 @seealso{netcdf_putAtt}\n\
 @end deftypefn")
 {
-  if (args.length() != 3) {
-    print_usage ();
-    return octave_value();
-  }
+  if (args.length() != 3) 
+    {
+      print_usage ();
+      return octave_value();
+    }
 
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value();
@@ -1379,7 +1529,18 @@ netcdf_getConstant(\"global\").\n\
   size_t len;
   octave_value data;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_att(ncid, varid, attname.c_str(), &xtype, &len));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
 
 #define OV_NETCDF_GET_ATT_CASE(netcdf_type,c_type)	                        \
   if (xtype == netcdf_type)						        \
@@ -1418,10 +1579,11 @@ netcdf_getConstant(\"global\").\n\
 @seealso{netcdf_getAtt}\n\
 @end deftypefn")
 {
-  if (args.length() != 4) {
-    print_usage ();
-    return octave_value();
-  }
+  if (args.length() != 4) 
+    {
+      print_usage ();
+      return octave_value();
+    }
 
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value();
@@ -1429,7 +1591,12 @@ netcdf_getConstant(\"global\").\n\
   octave_value data = args(3);
 
   nc_type xtype;
-  xtype = NC_BYTE;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   // get matching netcdf type
 
@@ -1597,7 +1764,8 @@ Return the id of a variable based on its name.\n\
 @end deftypefn")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1605,6 +1773,12 @@ Return the id of a variable based on its name.\n\
   int ncid = args(0).scalar_value();
   std::string varname = args(1).string_value();
   int varid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq_varid(ncid,varname.c_str(), &varid));
 
@@ -1620,7 +1794,8 @@ This functions returns all variable ids in a NetCDF file or NetCDF group.\n\
 @end deftypefn")
 {
 
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value ();
     }
@@ -1628,7 +1803,19 @@ This functions returns all variable ids in a NetCDF file or NetCDF group.\n\
   int ncid = args(0).scalar_value();
   int nvars;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_varids(ncid, &nvars, NULL));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   Array<int> varids = Array<int>(dim_vector(1,nvars));
   check_err(nc_inq_varids(ncid, &nvars, varids.fortran_vec()));
 
@@ -1701,7 +1888,8 @@ Returns the name and length of a NetCDF dimension.\n\
 @end deftypefn")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1710,14 +1898,15 @@ Returns the name and length of a NetCDF dimension.\n\
   int dimid = args(1).scalar_value();
   octave_value_list retval;
 
-  if (! error_state) {
-    char name[NC_MAX_NAME+1];
-    size_t length;
-    check_err(nc_inq_dim(ncid, dimid, name, &length));
-    
-    retval(0) = octave_value(std::string(name));
-    retval(1) = octave_value(length);
-  }
+  if (! error_state) 
+    {
+      char name[NC_MAX_NAME+1];
+      size_t length;
+      check_err(nc_inq_dim(ncid, dimid, name, &length));
+      
+      retval(0) = octave_value(std::string(name));
+      retval(1) = octave_value(length);
+    }
 
   return retval;
 }
@@ -1731,7 +1920,8 @@ Return the id of a NetCDF dimension.\n\
 @end deftypefn")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1741,11 +1931,11 @@ Return the id of a NetCDF dimension.\n\
   int id;
   octave_value_list retval;
 
-  if (! error_state) {
-    check_err(nc_inq_dimid(ncid, dimname.c_str(), &id));
-    
-    retval(0) = octave_value(id);
-  }
+  if (! error_state) 
+    {
+      check_err(nc_inq_dimid(ncid, dimname.c_str(), &id));      
+      retval(0) = octave_value(id);
+    }
 
   return retval;
 }
@@ -1761,16 +1951,24 @@ Per default this is not the case (@var{include_parents} is 0).\n\
 @seealso{netcdf_inqDim}\n\
 @end deftypefn")
 {
-  if (args.length() != 1 && args.length() != 2) {
+  if (args.length() != 1 && args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
   int include_parents = 0;
-  if (args.length() == 2) {
-    include_parents = args(0).scalar_value();  
-  }
+  if (args.length() == 2) 
+    {
+      include_parents = args(0).scalar_value();  
+    }
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   int ndims;
   check_err(nc_inq_ndims(ncid, &ndims));
@@ -1794,7 +1992,8 @@ Define a group in a NetCDF file.\n\
 @end deftypefn")
 {
 
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1802,6 +2001,12 @@ Define a group in a NetCDF file.\n\
   int parent_ncid = args(0).scalar_value();
   std::string name = args(1).string_value();
   int new_ncid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_def_grp(parent_ncid, name.c_str(), &new_ncid));
   return octave_value(new_ncid);
@@ -1816,7 +2021,8 @@ Return all groups ids in a NetCDF file.\n\
 @seealso{netcdf_inqGrps}\n\
 @end deftypefn")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1824,7 +2030,19 @@ Return all groups ids in a NetCDF file.\n\
   int ncid = args(0).scalar_value();
   int numgrps;
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_grps(ncid, &numgrps, NULL));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   Array<int> ncids = Array<int>(dim_vector(1,numgrps));
   check_err(nc_inq_grps(ncid, NULL, ncids.fortran_vec()));
     
@@ -1839,7 +2057,8 @@ Return group name in a NetCDF file.\n\
 @seealso{netcdf_inqGrps}\n\
 @end deftypefn")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1847,7 +2066,19 @@ Return group name in a NetCDF file.\n\
   int ncid = args(0).scalar_value();
   char name[NC_MAX_NAME+1];
 
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_grpname(ncid, name));    
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   return octave_value(std::string(name));
 }
 
@@ -1859,18 +2090,38 @@ Return full name of group in NetCDF file.\n\
 @seealso{netcdf_inqGrpName}\n\
 @end deftypefn")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
   size_t len;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_grpname_len(ncid,&len));
+
+  if (error_state)
+    {
+      return octave_value();      
+    }
+
   char* name = new char[len+1];
   octave_value retval;
-
   check_err(nc_inq_grpname_full(ncid, &len, name));
+
+  if (error_state)
+    {
+      delete name;
+      return octave_value();      
+    }
+
   retval = octave_value(std::string(name));
   delete name;
   return retval;
@@ -1884,13 +2135,20 @@ Return id of the parent group\n\
 @seealso{netcdf_inqGrpName}\n\
 @end deftypefn")
 {
-  if (args.length() != 1) {
+  if (args.length() != 1) 
+    {
       print_usage ();
       return octave_value();
     }
 
   int ncid = args(0).scalar_value();
   int parent_ncid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   check_err(nc_inq_grp_parent(ncid, &parent_ncid));
   return octave_value(parent_ncid);
@@ -1904,7 +2162,8 @@ Return the group id based on the full group name.\n\
 @seealso{netcdf_inqGrpName}\n\
 @end deftypefn")
 {
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1912,6 +2171,12 @@ Return the group id based on the full group name.\n\
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value();
   int grp_ncid;
+
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
 
   int format;
   check_err(nc_inq_format(ncid, &format));
@@ -1950,7 +2215,8 @@ Return group id based on its name\n\
 @seealso{netcdf_inqGrpFullNcid}\n\
 @end deftypefn")
 {
-  if (args.length() != 2) {
+  if (args.length() != 2) 
+    {
       print_usage ();
       return octave_value();
     }
@@ -1959,6 +2225,12 @@ Return group id based on its name\n\
   std::string name = args(1).string_value();
   int grp_ncid;
   
+  if (error_state)
+    {
+      print_usage ();
+      return octave_value();      
+    }
+
   check_err(nc_inq_ncid(ncid, name.c_str(), &grp_ncid));    
   return octave_value(grp_ncid);
 }
