@@ -78,11 +78,10 @@ octave_value netcdf_get_constant(octave_value ov)
 }
 
 
-void start_count_stride(int ncid, int varid, octave_value_list args,int len,size_t* start,size_t* count,ptrdiff_t* stride)
+void start_count_stride(int ncid, int varid, octave_value_list args,int len,
+                        int ndims, size_t* start,size_t* count,ptrdiff_t* stride)
 {
-  int ndims, dimids[NC_MAX_VAR_DIMS];
-
-  check_err(nc_inq_varndims (ncid, varid, &ndims));
+  OCTAVE_LOCAL_BUFFER (int, dimids, ndims);
   check_err(nc_inq_vardimid (ncid, varid, dimids));
 
   // default values for start, count and stride
@@ -1195,16 +1194,22 @@ The data @var{data} is stored in the variable @var{varid} of the NetCDF file @va
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value (); 
   octave_value data = args(args.length()-1);
-  size_t start[NC_MAX_VAR_DIMS];
-  size_t count[NC_MAX_VAR_DIMS];
-  ptrdiff_t stride[NC_MAX_VAR_DIMS];
-  nc_type xtype;
 
   if (error_state)
     {
       print_usage ();
       return octave_value();      
     }
+
+  int ndims;
+  check_err(nc_inq_varndims (ncid, varid, &ndims));
+
+  OCTAVE_LOCAL_BUFFER (size_t, start, ndims);
+  OCTAVE_LOCAL_BUFFER (size_t, count, ndims);
+  OCTAVE_LOCAL_BUFFER (ptrdiff_t, stride, ndims);
+
+  nc_type xtype;
+
 
   check_err(nc_inq_vartype (ncid, varid, &xtype));
   //int sliced_numel = tmp.numel();
@@ -1214,7 +1219,7 @@ The data @var{data} is stored in the variable @var{varid} of the NetCDF file @va
       return octave_value();      
     }
 
-  start_count_stride(ncid, varid, args, args.length()-1, start, count, stride);
+  start_count_stride(ncid, varid, args, args.length()-1, ndims, start, count, stride);
 
   // check if count matched size(data)
 
@@ -1274,10 +1279,6 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
   int varid = args(1).scalar_value ();   
   std::list<Range> ranges;
   int ndims;
-  size_t start[NC_MAX_VAR_DIMS];
-  size_t count[NC_MAX_VAR_DIMS];
-  ptrdiff_t stride[NC_MAX_VAR_DIMS];
-
   octave_value data;
   nc_type xtype;
 
@@ -1301,6 +1302,10 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
       return octave_value();      
     }
 
+  OCTAVE_LOCAL_BUFFER (size_t, start, ndims);
+  OCTAVE_LOCAL_BUFFER (size_t, count, ndims);
+  OCTAVE_LOCAL_BUFFER (ptrdiff_t, stride, ndims);
+
   int sz = 1;
 
   dim_vector sliced_dim_vector;
@@ -1316,7 +1321,7 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
       sliced_dim_vector.resize(ndims);
     }
 
-  start_count_stride(ncid, varid, args, args.length(), start, count, stride);
+  start_count_stride(ncid, varid, args, args.length(), ndims, start, count, stride);
 
   if (error_state)
     {
@@ -1842,7 +1847,7 @@ integer corresponding NetCDF constants.\n\
   int ncid = args(0).scalar_value();
   int varid = args(1).scalar_value();
   char name[NC_MAX_NAME+1];
-  int ndims, dimids[NC_MAX_VAR_DIMS], natts;
+  int ndims, natts;
   nc_type xtype;
   octave_value_list retval;
 
@@ -1853,6 +1858,7 @@ integer corresponding NetCDF constants.\n\
     }
     
   check_err(nc_inq_varndims(ncid, varid, &ndims));
+  OCTAVE_LOCAL_BUFFER (int, dimids, ndims);
     
   if (error_state) 
     {
