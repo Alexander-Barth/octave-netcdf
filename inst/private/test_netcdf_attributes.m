@@ -8,9 +8,9 @@ fname = [tempname '-octave-netcdf-rename-attrib.nc'];
 ncid = netcdf.create(fname,'NC_CLOBBER');
 gid = netcdf.getConstant('global');
 netcdf.putAtt(ncid,gid,'toto',int8(123));
-name = netcdf_inqAttName(ncid,gid,0);
+name = netcdf.inqAttName(ncid,gid,0);
 assert(strcmp(name,'toto'));
-netcdf_renameAtt(ncid,gid,'toto','lala');
+netcdf.renameAtt(ncid,gid,'toto','lala');
 name = netcdf.inqAttName(ncid,gid,0);
 assert(strcmp(name,'lala'));
 netcdf.close(ncid);
@@ -169,10 +169,10 @@ ncid = netcdf.create(fname,'NC_NETCDF4');
 dimids = [netcdf.defDim(ncid,'x',123) netcdf.defDim(ncid,'y',12)];
 varid = netcdf.defVar(ncid,'double_var','double',dimids);
 checksum = netcdf.inqVarFletcher32(ncid,varid);
-assert(strcmp(checksum,'nochecksum'))
+assert(strcmp(checksum,'NOCHECKSUM'))
 netcdf.defVarFletcher32(ncid,varid,'fletcher32');
 checksum = netcdf.inqVarFletcher32(ncid,varid);
-assert(strcmp(checksum,'fletcher32'))
+assert(strcmp(checksum,'FLETCHER32'))
 netcdf.close(ncid);
 %system(['ncdump -h ' fname])
 delete(fname);

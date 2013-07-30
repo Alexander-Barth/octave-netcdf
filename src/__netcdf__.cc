@@ -73,6 +73,7 @@ octave_value netcdf_get_constant(octave_value ov)
   else
     {
       error("unknown netcdf constant: %s",name.c_str());
+      return octave_value();
     }
 }
 
@@ -962,7 +963,7 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
 DEFUN_DLD(netcdf_defVarFletcher32, args,, 
 "-*- texinfo -*-\n\
 @deftypefn {Loadable Function} {} netcdf_defVarFletcher32(@var{ncid},@var{varid},@var{checksum}) \n\
-Defines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If @var{checksum} is the string \"fletcher32\", then fletcher32 checksums will be turned on for this variable. If @var{checksum} is \"nochecksum\", then checksums will be disabled. \n\
+Defines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If @var{checksum} is the string \"FLETCHER32\", then fletcher32 checksums will be turned on for this variable. If @var{checksum} is \"NOCHECKSUM\", then checksums will be disabled. \n\
 @end deftypefn\n\
 @seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
 {
@@ -993,7 +994,7 @@ Defines the checksum settings of the variable with the id @var{varid} in the dat
 DEFUN_DLD(netcdf_inqVarFletcher32, args,, 
 "-*- texinfo -*-\n\
 @deftypefn {Loadable Function} {@var{checksum} =} netcdf_inqVarFletcher32(@var{ncid},@var{varid}) \n\
-Determines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If fletcher32 checksums is turned on for this variable, then @var{checksum} is the string \"fletcher32\". Otherwise it is the string \"nochecksum\". \n\
+Determines the checksum settings of the variable with the id @var{varid} in the data set @var{ncid}. If fletcher32 checksums is turned on for this variable, then @var{checksum} is the string \"FLETCHER32\". Otherwise it is the string \"NOCHECKSUM\". \n\
 @end deftypefn\n\
 @seealso{netcdf_defVar,netcdf_inqVarFletcher32}\n")
 {
@@ -1018,11 +1019,11 @@ Determines the checksum settings of the variable with the id @var{varid} in the 
 
   if (checksum == NC_FLETCHER32) 
     {
-      return octave_value("fletcher32");
+      return octave_value("FLETCHER32");
     }
   else 
     {
-      return octave_value("nochecksum");
+      return octave_value("NOCHECKSUM");
     }  
 }
 

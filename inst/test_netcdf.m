@@ -15,12 +15,15 @@ tests = {'test_netcdf_constant',...
          'test_netcdf_ncwriteschema_group'...
         };
 
+maxlen = max(cellfun(@(s) length(s),tests));
+
 libver = netcdf.inqLibVers();
 fprintf('Using NetCDF library version "%s"\n',libver)
 
 for iindex=1:length(tests);
 
-  fprintf('run %34s: ',tests{iindex});
+  dots = repmat('.',1,maxlen - length(tests{iindex}));
+  fprintf('run %s%s ',tests{iindex},dots);
   try
     eval(tests{iindex});
     disp('  OK  ');
