@@ -13,7 +13,7 @@
 %% You should have received a copy of the GNU General Public License
 %% along with this program; If not, see <http://www.gnu.org/licenses/>.
 
-function test_netcdf_scalar_variable()
+function test_scalar_variable()
 import_netcdf
 
 fname = [tempname '-octave-netcdf.nc'];
