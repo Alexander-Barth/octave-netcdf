@@ -17,6 +17,8 @@ function test_netcdf_low_level_interface
 
 import_netcdf
 
+% 2 dimensions
+
 fname = [tempname '-octave-netcdf.nc'];
 
 ncid = netcdf.create(fname,'NC_CLOBBER');
@@ -112,3 +114,110 @@ assert(all(vari2 == vari))
 
 netcdf.close(ncid);
 delete(fname);
+
+% test with different dimensions
+
+for i = 2:5
+  nc_test_ndims(i);
+end
+
+
+
+function nc_test_ndims(ndims)
+import_netcdf
+
+fname = [tempname '-octave-netcdf.nc'];
+
+ncid = netcdf.create(fname,'NC_CLOBBER');
+
+sz = ones(ndims,1);
+dimids = ones(ndims,1);
+
+for i = 1:ndims
+  sz(i) = 10+i;  
+  dimids(i) = netcdf.defDim(ncid,sprintf('dim%g',i),sz(i));  
+end
+
+varid = netcdf.defVar(ncid,'double_var','double',dimids);
+
+[varname,xtype,dimids,natts] = netcdf.inqVar(ncid,varid);
+assert(strcmp(varname,'double_var'));
+
+for i = 1:ndims
+  [dimname,len] = netcdf.inqDim(ncid,dimids(i));  
+  assert(len == sz(i));
+  assert(strcmp(dimname,sprintf('dim%g',i)));
+end
+
+
+netcdf.endDef(ncid)
+
+z = randn(sz);
+netcdf.putVar(ncid,varid,z);
+
+
+z2 = netcdf.getVar(ncid,varid);
+assert(isequal(z,z2))
+
+z2 = netcdf.getVar(ncid,varid,zeros(ndims,1));
+assert(z2 == z(1))
+
+start = 2 * ones(ndims,1);
+count = 5 * ones(ndims,1);
+z2 = netcdf.getVar(ncid,varid,start,count);
+idx = scs(start,count);
+assert(isequal(z2,z(idx{:})))
+
+
+start = 2 * ones(ndims,1);
+count = 5 * ones(ndims,1);
+stride = 2 * ones(ndims,1);
+z2 = netcdf.getVar(ncid,varid,start,count,stride);
+idx = scs(start,count,stride);
+assert(isequal(z2,z(idx{:})))
+
+
+% put with start
+start = zeros(ndims,1);
+netcdf.putVar(ncid,varid,start,123.);
+z(1) = 123;
+z2 = netcdf.getVar(ncid,varid);
+assert(isequal(z,z2))
+
+
+% put with start and count
+
+start = 2 * ones(ndims,1);
+count = 5 * ones(ndims,1);
+netcdf.putVar(ncid,varid,start,count,ones(count));
+idx = scs(start,count);
+z(idx{:}) = 1;
+z2 = netcdf.getVar(ncid,varid);
+assert(isequal(z,z2))
+
+% put with start, count and stride
+
+start = 2 * ones(ndims,1);
+count = 5 * ones(ndims,1);
+stride = 2 * ones(ndims,1);
+netcdf.putVar(ncid,varid,start,count,stride,zeros(count));
+idx = scs(start,count,stride);
+z(idx{:}) = 0;
+z2 = netcdf.getVar(ncid,varid);
+assert(isequal(z,z2))
+
+
+
+netcdf.close(ncid);
+delete(fname);
+
+function idx = scs(start,count,stride)
+idx = cell(length(start),1);
+
+if nargin == 2
+  stride = ones(length(start),1);
+end
+  
+for i = 1:length(start)
+  idx{i} = start(i) + 1 + stride(i) * [0:count(i)-1];
+end

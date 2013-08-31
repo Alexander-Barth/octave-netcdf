@@ -24,6 +24,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <inttypes.h>
 
 std::map<std::string, octave_value> netcdf_constants;
 
@@ -77,6 +78,31 @@ octave_value netcdf_get_constant(octave_value ov)
     }
 }
 
+size_t to_size_t(octave_value ov) {
+  size_t sz;
+  sz = static_cast<uint64_t>(ov.uint64_scalar_value());
+  return sz;
+}
+
+void to_size_t_vector(octave_value ov, int len, size_t *vec) {
+  uint64NDArray tmp = ov.uint64_array_value();
+  
+  for (int i=0; i<len; i++) 
+	{      
+	  vec[i] = static_cast<uint64_t>(tmp(len-i-1));
+	}    
+
+}
+
+void to_ptrdiff_t_vector(octave_value ov, int len, ptrdiff_t *vec) {
+  int64NDArray tmp = ov.int64_array_value();
+  
+  for (int i=0; i<len; i++) 
+	{      
+	  vec[i] = static_cast<int64_t>(tmp(len-i-1));
+	}    
+
+}
 
 void start_count_stride(int ncid, int varid, octave_value_list args,int len,
                         int ndims, size_t* start,size_t* count,ptrdiff_t* stride)
@@ -98,22 +124,19 @@ void start_count_stride(int ncid, int varid, octave_value_list args,int len,
 
   if (len > 2) 
     {
-      uint64NDArray tmp = args(2).uint64_array_value();
-
-      if (tmp.dims().numel() != ndims) 
+      if (args(2).numel() != ndims) 
 	{
 	  error("number of elements of argument %s should match the number "
 		"of dimension of the netCDF variable",
 		"start");
 	}      
 
+      to_size_t_vector(args(2),ndims,start);
+
+      // if start is specified, the default for count is 1 (how odd!)
       for (int i=0; i<ndims; i++) 
 	{      
-	  start[i] = (size_t)tmp(ndims-i-1);
-
-	  // if start is specified, the default for count is 1 (how odd!)
 	  count[i] = 1;
-	  //cout << "start " << start[i] << " " << i << endl;
 	}    
     }
 
@@ -121,42 +144,30 @@ void start_count_stride(int ncid, int varid, octave_value_list args,int len,
 
   if (len > 3) 
     {
-      uint64NDArray tmp = args(3).uint64_array_value();
 
-      if (tmp.dims().numel() != ndims) 
+      if (args(3).numel() != ndims) 
 	{
 	  error("number of elements of argument %s should match the number "
 		"of dimension of the netCDF variable",
 		"count");
 	}      
 
-      for (int i=0; i<ndims; i++) 
-	{      
-	  count[i] = (size_t)tmp(ndims-i-1);
-	  //count[i] = (size_t)tmp(i);
-	  //cout << "count " << count[i] << " " << i << endl;
-	}    
+      to_size_t_vector(args(3),ndims,count);
     }
 
   // stride argument
 
   if (len > 4) 
     {
-      int64NDArray tmp = args(4).int64_array_value();
-
-      if (tmp.dims().numel() != ndims) 
+      if (args(4).numel() != ndims) 
 	{
 	  error("number of elements of argument %s should match the number "
 		"of dimension of the netCDF variable",
 		"stride");
 	}      
 
-      for (int i=0; i<ndims; i++) 
-	{      
-	  stride[i] = (ptrdiff_t)tmp(ndims-i-1);
-	}    
+      to_ptrdiff_t_vector(args(4),ndims,stride);
     }
-
 }
 
 
@@ -268,8 +279,8 @@ Sets the default chunk cache settins in the HDF5 library. The settings applies t
       return octave_value();
     }
   
-  size_t size = args(0).scalar_value();
-  size_t nelems = args(1).scalar_value();
+  size_t size = to_size_t(args(0));
+  size_t nelems = to_size_t(args(1));
   float preemption = args(2).scalar_value();
 
   if (error_state)
@@ -604,7 +615,7 @@ Define the dimension with the name @var{name} and the length @var{len} in the da
 
   int ncid = args(0).scalar_value();
   std::string name = args(1).string_value();
-  size_t len = args(2).scalar_value();
+  size_t len = to_size_t(args(2));
   int dimid;
 
   if (error_state)
@@ -980,13 +991,8 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
     }
 
     if (args.length() == 4) {
-      Array<double> tmp = args(3).vector_value();
-
-      OCTAVE_LOCAL_BUFFER (size_t, chunksizes, tmp.numel());
-      for (int i = 0; i < tmp.numel(); i++)
-        {
-          chunksizes[i] = tmp(tmp.numel()-i-1);
-        }
+      OCTAVE_LOCAL_BUFFER (size_t, chunksizes, args(3).numel());
+      to_size_t_vector(args(3), args(3).numel(),chunksizes);
 
       check_err(nc_def_var_chunking(ncid, varid, storage, chunksizes));
     }
@@ -1029,7 +1035,8 @@ If @var{storage} is the string \"contiguous\", the variable is stored in a conti
 
     if (storage == NC_CHUNKED) {
       retval(0) = octave_value("chunked");
-      Array<int> chunkSizes = Array<int>(dim_vector(1,ndims));
+      // should use uint32NDArray on 32-bit?
+      uint64NDArray chunkSizes = uint64NDArray(dim_vector(1,ndims));
 
       for (int i = 0; i < ndims; i++)
         {
