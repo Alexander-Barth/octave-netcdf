@@ -117,7 +117,7 @@ delete(fname);
 
 % test with different dimensions
 
-for i = 2:5
+for i = 1:5
   nc_test_ndims(i);
 end
 
@@ -152,7 +152,12 @@ end
 
 netcdf.endDef(ncid)
 
-z = randn(sz);
+if ndims == 1
+  z = randn(sz,1);
+else
+  z = randn(sz);
+end
+
 netcdf.putVar(ncid,varid,z);
 
 
