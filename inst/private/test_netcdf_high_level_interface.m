@@ -23,11 +23,16 @@ nccreate(fname,'u','Dimensions',{'lon','lat'});
 u = randn(10,20);
 ncwrite(fname,'u',u);
 
+% for octave prior to 3.8.0
+if isempty(which('isequaln'))
+  isequaln = @(x,y) isequalwithequalnans(x,y);
+end
+
 u2 = ncread(fname,'u');
-assert(isequalwithequalnans(u,u2));
+assert(isequaln(u,u2));
 
 u2 = ncread(fname,'u',[10 5],[inf inf],[1 1]);
-assert(isequalwithequalnans(u(10:end,5:end),u2));
+assert(isequaln(u(10:end,5:end),u2));
 
 ncwriteatt(fname,'temp','units','degree Celsius');
 assert(strcmp(ncreadatt(fname,'temp','units'),'degree Celsius'));
