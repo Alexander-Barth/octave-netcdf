@@ -21,13 +21,13 @@
 ##
 ## The following properties can be used:
 ## @itemize
-## @item "dimensions": a cell array with the dimension names followed by their
+## @item "Dimensions": a cell array with the dimension names followed by their
 ## length or Inf if the dimension is unlimited. If the property is ommited, a 
 ## scalar variable is created.
-## @item "datatype": a string with the Octave data type name 
+## @item "Datatype": a string with the Octave data type name 
 ## (see @code{ncinfo} for the correspondence between Octave and NetCDF data 
 ## types). The default data type is a "double".
-## @item "format": This can be "netcdf4_classic" (default), "classic", "64bit" 
+## @item "Format": This can be "netcdf4_classic" (default), "classic", "64bit" 
 ## or "netcdf4".
 ## @item "FillValue": the value used for undefined elements of the NetCDF 
 ## variable.
