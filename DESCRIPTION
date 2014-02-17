@@ -5,7 +5,7 @@ Author: Alexander Barth <barth.alexander@gmail.com>
 Maintainer: Alexander Barth <barth.alexander@gmail.com>
 Title: netcdf
 Description: A MATLAB compatible NetCDF interface for Octave
-Depends: octave (>= 3.4.0), statistics (>= 1.0.6)
+Depends: octave (>= 3.4.0)
 BuildRequires: netcdf-devel
 License: GPLv2+
 Url: http://modb.oce.ulg.ac.be/mediawiki/index.php/Octave-netcdf, http://octave.sf.net
