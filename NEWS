@@ -1,3 +1,9 @@
+Summary of important user-visible changes for netcdf 1.0.4:
+-------------------------------------------------------------------
+
+ ** Work-around for problem in netcdf 4.1.3 for reading a unlimited
+    variable of current size 0
+
 Summary of important user-visible changes for netcdf 1.0.3:
 -------------------------------------------------------------------
 

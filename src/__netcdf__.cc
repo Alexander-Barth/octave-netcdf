@@ -1304,6 +1304,8 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
 
   check_err(nc_inq_varndims (ncid, varid, &ndims));
 
+  //std::cout << "ndims " << ndims << std::endl;
+
   if (error_state)
     {
       return octave_value();      
@@ -1329,6 +1331,9 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
     }
 
   start_count_stride(ncid, varid, args, args.length(), ndims, start, count, stride);
+  // std::cout << "count " << count[0] << std::endl;
+  // std::cout << "start " << start[0] << std::endl;
+  // std::cout << "stide " << stride[0] << std::endl;
 
   if (error_state)
     {
@@ -1344,24 +1349,28 @@ The data @var{data} is loaded from the variable @var{varid} of the NetCDF file @
     //sliced_dim_vector(i) = count[i];
   }
 
+  // std::cout << "sz " << sz << std::endl;
+  // std::cout << "sliced_dim_vector " << sliced_dim_vector(0) << " x " << sliced_dim_vector(1) << std::endl;
 
-  //cout << "start " << start[0] << endl;
-  // need to take count and stride
-
-
-
-  //cout << "sz " << sz << endl;
-  //cout << "sliced_dim_vector " << sliced_dim_vector(0) << " x " << sliced_dim_vector(1) << endl;
-
+  // Array < float > arr = Array < float >(sliced_dim_vector);   
+  // float* time;
+  // time = (float*)malloc(10 * sizeof(float));
+  // check_err(nc_get_vars(ncid, varid, start, count, stride, time));
+  // data = octave_value(arr);                                                  
+  // return data;
+      
   switch (xtype)
     {
-#define OV_NETCDF_GET_VAR_CASE(netcdf_type,c_type)	                        \
-      case netcdf_type:							\
-      {                                                                                 \
-	Array < c_type > arr = Array < c_type >(sliced_dim_vector);                     \
-	check_err(nc_get_vars(ncid, varid, start, count, stride, arr.fortran_vec()));   \
-	data = octave_value(arr);                                                       \
-	break;                                                                          \
+#define OV_NETCDF_GET_VAR_CASE(netcdf_type,c_type)	                                 \
+      case netcdf_type:							                 \
+      {                                                                                  \
+	Array < c_type > arr = Array < c_type >(sliced_dim_vector);                      \
+        /* necessary for netcdf 4.1.3 */                                                 \
+        if (sz > 0) {                                                                    \
+  	   check_err(nc_get_vars(ncid, varid, start, count, stride, arr.fortran_vec())); \
+        }                                                                                \
+	data = octave_value(arr);                                                        \
+	break;                                                                           \
       }                                                                                 
 
       OV_NETCDF_GET_VAR_CASE(NC_BYTE,octave_int8)

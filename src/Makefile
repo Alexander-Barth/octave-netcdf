@@ -25,3 +25,6 @@ __netcdf__.oct: $(SRC) netcdf_constants.h
 
 check: ../PKG_ADD __netcdf__.oct	
 	($(OCTAVE) -f --eval "pkg unload octcdf; addpath $$PWD; addpath $$PWD/../inst; test_netcdf")
+
+check2: ../PKG_ADD __netcdf__.oct	
+	($(OCTAVE) -f --eval "addpath $$PWD; addpath $$PWD/../inst; test_netcdf")
