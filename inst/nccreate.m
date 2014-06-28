@@ -73,6 +73,8 @@ for i = 1:2:length(varargin)
     FillValue = varargin{i+1};
   elseif strcmp(varargin{i},'ChunkSize')
     ChunkSize = varargin{i+1};
+  elseif strcmp(vargin{i},'DeflateLevel')
+    DeflateLevel = vargin{i+1};
   elseif strcmp(varargin{i},'Shuffle')
     Shuffle = varargin{i+1};
   else
@@ -87,9 +89,6 @@ else
   mode = format2mode(ncformat);
   ncid = netcdf_create(filename,mode);
 end
-
-%
-%varid = netcdf_inqVarID(ncid, varname);
 
 % create dimensions
 
