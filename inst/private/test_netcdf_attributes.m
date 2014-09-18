@@ -1,4 +1,4 @@
-%% Copyright (C) 2013 Alexander Barth
+%% Copyright (C) 2013-2014 Alexander Barth
 %%
 %% This program is free software; you can redistribute it and/or modify
 %% it under the terms of the GNU General Public License as published by
@@ -287,6 +287,7 @@ assert(strcmp(name,'x'));
 netcdf.renameDim(ncid,dimid,'y');
 [name,len] = netcdf.inqDim(ncid,dimid);
 assert(strcmp(name,'y'));
+netcdf.close(ncid);
 delete(fname);
 
 
