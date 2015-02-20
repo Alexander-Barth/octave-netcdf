@@ -2,6 +2,8 @@ Summary of important user-visible changes for netcdf 1.0.5:
 -------------------------------------------------------------------
 
  ** Implement DeflateLevel in nccreate
+ ** ncread: do not replace _FillValue by NaNs for characters
+ ** ncdisp: fix for attributes value with %-sign 
 
 Summary of important user-visible changes for netcdf 1.0.4:
 -------------------------------------------------------------------
