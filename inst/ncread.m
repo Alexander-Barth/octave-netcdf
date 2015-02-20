@@ -28,8 +28,9 @@
 ## loaded.
 ##
 ## If the variable has the _FillValue attribute, then the corresponding values
-## are replaced by NaN. NetCDF attributes scale_factor (default 1) and 
-## add_offset (default 0) are use the transform the variable during the loading:
+## are replaced by NaN (except for characters). NetCDF attributes scale_factor 
+## (default 1) and add_offset (default 0) are use the transform the variable 
+## during the loading:
 ##
 ## x = scale_factor * x_in_file + add_offset
 ##
@@ -97,7 +98,8 @@ if !isempty(factor) || !isempty(factor) || !isempty(offset)
   end
 end
 
-if !isempty(fv)
+if !isempty(fv) && xtype != netcdf_getConstant('char') && ...
+   xtype != netcdf_getConstant('string')
   x(x == fv) = NaN;
 end
 

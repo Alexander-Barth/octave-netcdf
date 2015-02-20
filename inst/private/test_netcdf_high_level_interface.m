@@ -90,3 +90,40 @@ assert(info.Dimensions(2).Unlimited)
 
 delete(fname)
 
+
+% test double with _FillValue
+
+fname = [tempname '-octave-netcdf.nc'];
+fv = 99999.;
+nccreate(fname,'flag','Dimensions',{'lon',10,'lat',10},'Datatype','double',...
+         'FillValue',fv);
+
+%system(['ncdump -h ' fname])
+data = zeros(10,10);
+data(1,2) = fv;
+ncid = netcdf_open(fname,'NC_WRITE');
+varid = netcdf_inqVarID(ncid, 'flag');
+netcdf_putVar(ncid,varid,data);
+data2 = ncread(fname,'flag');
+data(data == fv) = NaN;
+assert(isequaln(data,data2))
+delete(fname)
+
+
+% test char with _FillValue
+
+fname = [tempname '-octave-netcdf.nc'];
+fv = '*';
+nccreate(fname,'flag','Dimensions',{'lon',10,'lat',10},'Datatype','char',...
+         'FillValue',fv);
+data = repmat('.',[10 10]);
+data(1,2) = fv;
+
+ncid = netcdf_open(fname,'NC_WRITE');
+varid = netcdf_inqVarID(ncid, 'flag');
+netcdf_putVar(ncid,varid,data);
+data2 = ncread(fname,'flag');
+
+assert(isequal(data,data2))
+delete(fname)
+
