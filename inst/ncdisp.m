@@ -149,7 +149,7 @@ if strcmp(getenv("TERM"),"xterm")
   
   c = getfield(colors,color);
 
-  fprintf([c, msg, reset]);
+  fprintf('%s',[c, msg, reset]);
 else
-  fprintf(msg);
+  fprintf('%s',msg);
 end
