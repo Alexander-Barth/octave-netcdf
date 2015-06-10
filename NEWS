@@ -1,7 +1,12 @@
+Summary of important user-visible changes for netcdf 1.0.8:
+-------------------------------------------------------------------
+
+ ** Fix bug #45190, netcdf(nccreate) to enable DeflateLevel in nccreate
+
 Summary of important user-visible changes for netcdf 1.0.7:
 -------------------------------------------------------------------
 
- ** apply patch from John Donoghue to allow cross-compilation (bug #44837)
+ ** Apply patch from John Donoghue to allow cross-compilation (bug #44837)
 
 Summary of important user-visible changes for netcdf 1.0.6:
 -------------------------------------------------------------------
