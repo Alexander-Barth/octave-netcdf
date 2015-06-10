@@ -1,10 +1,13 @@
-LIBS=$(shell nc-config --libs)
-AWK=awk
-MKOCTFILE=mkoctfile
-OCTAVE=octave
-NCHEADER=$(shell nc-config --includedir)/netcdf.h
+sinclude Makeconf
+
+AWK ?= awk
+MKOCTFILE ?= mkoctfile
+OCTAVE ?= octave
+NC_CONFIG ?= nc-config
+NCHEADER=$(shell $(NC_CONFIG) --includedir)/netcdf.h
 SRC=__netcdf__.cc
-CFLAGS=$(shell nc-config --cflags)
+CFLAGS=$(shell $(NC_CONFIG) --cflags)
+LIBS=$(shell $(NC_CONFIG) --libs)
 
 all: __netcdf__.oct
 

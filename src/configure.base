@@ -50,6 +50,9 @@ dnl Check for mkoctfile
 AC_CHECK_PROG(MKOCTFILE,mkoctfile,mkoctfile)
 test -z "$MKOCTFILE" &&	AC_MSG_WARN([no mkoctfile found on path])
 
+AC_CHECK_PROG(OCTAVE_CONFIG,octave-config,octave-config)
+test -z "$OCTAVE_CONFIG" &&	AC_MSG_WARN([no octave-config found on path])
+
 AC_SUBST(ver)
 AC_SUBST(subver)
 AC_SUBST(mpath)
@@ -252,6 +255,13 @@ AC_MSG_RESULT($$2)
 AC_SUBST($2)
 ])
 
+AC_DEFUN(OCTAVE_CONFIG_EVAL,
+[AC_MSG_CHECKING([for $1 in octave-config])
+$2=`$OCTAVE_CONFIG -p $1`
+AC_MSG_RESULT($$2)
+AC_SUBST($2)
+])
+
 dnl Check status of an octave variable
 dnl
 dnl OCTAVE_CHECK_EXIST(variable,action_if_true,action_if_false)
@@ -269,13 +279,13 @@ fi
 
 dnl should check that $(OCTAVE) --version matches $(MKOCTFILE) --version
 AC_CHECK_PROG(OCTAVE,octave,octave)
-OCTAVE_EVAL(OCTAVE_VERSION,OCTAVE_VERSION)
+OCTAVE_CONFIG_EVAL(VERSION,OCTAVE_VERSION)
 
 dnl grab canonical host type so we can write system specific install stuff
-OCTAVE_EVAL(octave_config_info('canonical_host_type'),canonical_host_type)
+OCTAVE_CONFIG_EVAL(CANONICAL_HOST_TYPE,canonical_host_type)
 
 dnl grab SHLEXT from octave config
-OCTAVE_EVAL(octave_config_info('SHLEXT'),SHLEXT)
+OCTAVE_CONFIG_EVAL(SHLEXT,SHLEXT)
 
 AC_PROG_LN_S
 
@@ -310,13 +320,14 @@ esac
 
 dnl checking for nc-config
 
-AC_CHECK_PROG(NC_CONFIG, nc-config, nc-config)
+dnl AC_CHECK_PROG(NC_CONFIG, nc-config, nc-config)
+AC_CHECK_TOOL(NC_CONFIG, nc-config, nc-config)
 if test -z "$NC_CONFIG"; then
 AC_MSG_ERROR([nc-config not found], 1);
 fi
 
-NETCDF_LIBS="$NETCDF_LIBS `nc-config --libs`"
-NETCDF_CFLAGS="$NETCDF_CFLAGS `nc-config --cflags`"
+NETCDF_LIBS="$NETCDF_LIBS `$NC_CONFIG --libs`"
+NETCDF_CFLAGS="$NETCDF_CFLAGS `$NC_CONFIG --cflags`"
 
 
 CONFIGURE_OUTPUTS="Makeconf"
@@ -336,7 +347,8 @@ shell commands will install into the following directories:
    headers:   $includedir
 
 octave-forge is configured with
-   octave:      $OCTAVE (version $OCTAVE_VERSION)
-   mkoctfile:	$MKOCTFILE for Octave $subver
+   octave:        $OCTAVE (version $OCTAVE_VERSION)
+   mkoctfile:	  $MKOCTFILE for Octave $subver
+   octave-config: $OCTAVE_CONFIG for Octave $subver
    netCDF compiler flags: $NETCDF_CFLAGS
    netCDF libraries: $NETCDF_LIBS"
