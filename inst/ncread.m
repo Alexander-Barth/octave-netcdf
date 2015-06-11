@@ -38,6 +38,9 @@
 ## _FillValue, add_offset or scale_factor are defined in which case the output 
 ## is a array in double precision.
 ##
+## Note that values equal to the attribute missing_value are not replaced by 
+## NaN (for compatibility).
+##
 ## @seealso{ncwrite,ncinfo,ncdisp}
 ##
 ## @end deftypefn
