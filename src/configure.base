@@ -326,8 +326,24 @@ if test -z "$NC_CONFIG"; then
 AC_MSG_ERROR([nc-config not found], 1);
 fi
 
-NETCDF_LIBS="$NETCDF_LIBS `$NC_CONFIG --libs`"
-NETCDF_CFLAGS="$NETCDF_CFLAGS `$NC_CONFIG --cflags`"
+
+dnl The following will be either "yes" or "no"
+AC_MSG_CHECKING(for netcdf4 support)
+NETCDF_V4=`$NC_CONFIG --has-nc4`
+if test x$NETCDF_V4 != yes; then
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+   AC_MSG_ERROR(netcdf4 support missing. Did you disable netcdf4 features?)
+fi
+
+dnl other way to check this
+dnl NETCDF_LIBS="$NETCDF_LIBS `$NC_CONFIG --libs`"
+dnl NETCDF_CFLAGS="$NETCDF_CFLAGS `$NC_CONFIG --cflags`"
+dnl CFLAGS="$NETCDF_CFLAGS $CFLAGS"
+dnl CXXFLAGS="$NETCDF_CFLAGS $CXXFLAGS"
+dnl LDFLAGS="$NETCDF_LIBS $LDFLAGS"
+dnl AC_CHECK_LIB([netcdf], [nc_set_chunk_cache], , [AC_MSG_ERROR(nc_set_chunk_cache was not found in the netCDF library. Did you disable netcdf4 features?)])
 
 
 CONFIGURE_OUTPUTS="Makeconf"
