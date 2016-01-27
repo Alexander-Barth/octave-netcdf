@@ -2140,12 +2140,12 @@ Return full name of group in NetCDF file.\n\
 
   if (error_state)
     {
-      delete name;
+      delete[] name;
       return octave_value();      
     }
 
   retval = octave_value(std::string(name));
-  delete name;
+  delete[] name;
   return retval;
 }
 
