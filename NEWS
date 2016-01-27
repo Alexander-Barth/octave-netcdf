@@ -1,7 +1,8 @@
 Summary of important user-visible changes for netcdf 1.0.8:
 -------------------------------------------------------------------
 
- ** Fix bug #45190, netcdf(nccreate) to enable DeflateLevel in nccreate
+ ** Fix bug #45190, #46747: netcdf(nccreate) to enable DeflateLevel in nccreate
+ ** Fix bug #46798: using the right delete operator
 
 Summary of important user-visible changes for netcdf 1.0.7:
 -------------------------------------------------------------------
