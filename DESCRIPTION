@@ -6,6 +6,7 @@ Maintainer: Alexander Barth <barth.alexander@gmail.com>
 Title: netcdf
 Description: A MATLAB compatible NetCDF interface for Octave
 Depends: octave (>= 3.4.0)
-BuildRequires: netcdf-devel
+BuildRequires: netcdf-devel [Fedora]
+BuildRequires: libnetcdf-dev [Debian], netcdf-bin [Debian]
 License: GPLv2+
 Url: http://modb.oce.ulg.ac.be/mediawiki/index.php/Octave-netcdf, http://octave.sf.net
