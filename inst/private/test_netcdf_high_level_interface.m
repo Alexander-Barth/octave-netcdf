@@ -12,7 +12,7 @@
 %%
 %% You should have received a copy of the GNU General Public License
 %% along with this program; If not, see <http://www.gnu.org/licenses/>.
-
+import_netcdf
 
 fname = [tempname '-octave-netcdf.nc'];
 
@@ -101,9 +101,11 @@ nccreate(fname,'flag','Dimensions',{'lon',10,'lat',10},'Datatype','double',...
 %system(['ncdump -h ' fname])
 data = zeros(10,10);
 data(1,2) = fv;
-ncid = netcdf_open(fname,'NC_WRITE');
-varid = netcdf_inqVarID(ncid, 'flag');
-netcdf_putVar(ncid,varid,data);
+ncid = netcdf.open(fname,'NC_WRITE');
+varid = netcdf.inqVarID(ncid, 'flag');
+netcdf.putVar(ncid,varid,data);
+netcdf.close(ncid)
+
 data2 = ncread(fname,'flag');
 data(data == fv) = NaN;
 assert(isequaln(data,data2))
@@ -119,11 +121,17 @@ nccreate(fname,'flag','Dimensions',{'lon',10,'lat',10},'Datatype','char',...
 data = repmat('.',[10 10]);
 data(1,2) = fv;
 
-ncid = netcdf_open(fname,'NC_WRITE');
-varid = netcdf_inqVarID(ncid, 'flag');
-netcdf_putVar(ncid,varid,data);
-data2 = ncread(fname,'flag');
+ncid = netcdf.open(fname,'NC_WRITE');
+varid = netcdf.inqVarID(ncid, 'flag');
+netcdf.putVar(ncid,varid,data);
+netcdf.close(ncid)
 
+data2 = ncread(fname,'flag');
 assert(isequal(data,data2))
 delete(fname)
 
+
+
+% test case for bug  47014
+
+bug_47014

@@ -11,8 +11,8 @@ varidd = netcdf.defVar(ncid,'time','double',[dimid]);
 netcdf.close(ncid)
 
 
-ncid = netcdf_open(fname,'NC_NOWRITE');
-varid = netcdf_inqVarID(ncid, 'time');
-x = netcdf_getVar(ncid,varid);
+ncid = netcdf.open(fname,'NC_NOWRITE');
+varid = netcdf.inqVarID(ncid, 'time');
+x = netcdf.getVar(ncid,varid);
 netcdf.close(ncid)
 

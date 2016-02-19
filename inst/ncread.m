@@ -95,14 +95,22 @@ for i = 0:natts-1
   end    
 end
 
-if !isempty(factor) || !isempty(factor) || !isempty(offset)
+netcdf_close(ncid);
+
+# the scaling does not make sense of characters
+if xtype == netcdf_getConstant('char') || ...
+   xtype == netcdf_getConstant('string')
+
+   return;
+end
+
+if !isempty(fv) || !isempty(factor) || !isempty(offset)
   if !isa(x,'double')
     x = double(x);
   end
 end
 
-if !isempty(fv) && xtype != netcdf_getConstant('char') && ...
-   xtype != netcdf_getConstant('string')
+if !isempty(fv)
   x(x == fv) = NaN;
 end
 
@@ -114,4 +122,3 @@ if !isempty(offset)
   x = x + offset;
 end
 
-netcdf_close(ncid);

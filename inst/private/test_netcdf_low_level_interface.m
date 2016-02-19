@@ -130,8 +130,8 @@ fname = [tempname '-octave-netcdf.nc'];
 
 ncid = netcdf.create(fname,'NC_CLOBBER');
 
-sz = ones(ndims,1);
-dimids = ones(ndims,1);
+sz = ones(1,ndims);
+dimids = ones(1,ndims);
 
 for i = 1:ndims
   sz(i) = 10+i;  
@@ -167,23 +167,23 @@ assert(isequal(z,z2))
 z2 = netcdf.getVar(ncid,varid,zeros(ndims,1));
 assert(z2 == z(1))
 
-start = 2 * ones(ndims,1);
-count = 5 * ones(ndims,1);
+start = 2 * ones(1,ndims);
+count = 5 * ones(1,ndims);
 z2 = netcdf.getVar(ncid,varid,start,count);
 idx = scs(start,count);
 assert(isequal(z2,z(idx{:})))
 
 
-start = 2 * ones(ndims,1);
-count = 5 * ones(ndims,1);
-stride = 2 * ones(ndims,1);
+start = 2 * ones(1,ndims);
+count = 5 * ones(1,ndims);
+stride = 2 * ones(1,ndims);
 z2 = netcdf.getVar(ncid,varid,start,count,stride);
 idx = scs(start,count,stride);
 assert(isequal(z2,z(idx{:})))
 
 
 % put with start
-start = zeros(ndims,1);
+start = zeros(1,ndims);
 netcdf.putVar(ncid,varid,start,123.);
 z(1) = 123;
 z2 = netcdf.getVar(ncid,varid);
@@ -192,9 +192,14 @@ assert(isequal(z,z2))
 
 % put with start and count
 
-start = 2 * ones(ndims,1);
-count = 5 * ones(ndims,1);
-netcdf.putVar(ncid,varid,start,count,ones(count));
+start = 2 * ones(1,ndims);
+count = 5 * ones(1,ndims);
+if ndims == 1
+    data = ones(count,1);
+else
+    data = ones(count);
+end
+netcdf.putVar(ncid,varid,start,count,data);
 idx = scs(start,count);
 z(idx{:}) = 1;
 z2 = netcdf.getVar(ncid,varid);
@@ -202,10 +207,15 @@ assert(isequal(z,z2))
 
 % put with start, count and stride
 
-start = 2 * ones(ndims,1);
-count = 5 * ones(ndims,1);
-stride = 2 * ones(ndims,1);
-netcdf.putVar(ncid,varid,start,count,stride,zeros(count));
+start = 2 * ones(1,ndims);
+count = 5 * ones(1,ndims);
+stride = 2 * ones(1,ndims);
+if ndims == 1
+    data = zeros(count,1);
+else
+    data = zeros(count);
+end
+netcdf.putVar(ncid,varid,start,count,stride,data);
 idx = scs(start,count,stride);
 z(idx{:}) = 0;
 z2 = netcdf.getVar(ncid,varid);

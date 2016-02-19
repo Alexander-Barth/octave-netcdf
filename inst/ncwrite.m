@@ -84,16 +84,16 @@ for i = 0:natts-1
   end    
 end
 
-if ~isempty(fv)
-  x(isnan(x)) = fv;
-end
-
 if ~isempty(offset)
   x = x - offset;
 end
 
 if ~isempty(factor)
   x = x / factor;
+end
+
+if ~isempty(fv)
+  x(isnan(x)) = fv;
 end
 
 netcdf_putVar(gid,varid,start-1,count,stride,x);
